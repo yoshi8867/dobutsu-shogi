@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>동물쇼기</title>
+<meta name="description" content="3×4 판에서 두는 동물쇼기. 태블릿을 눕혀놓고 마주 앉아 둔다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@300;400;700&family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+:root{
+  --paper:#efe4cd; --ink:#241a10; --ink-soft:#6f5a41; --rule:#cdb896;
+  --wood:#e0bc80; --lacquer:#6b4a26; --vermilion:#b8402a;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Gothic A1',system-ui,sans-serif;line-height:1.75;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:clamp(40px,8vw,88px) 24px 96px}
+
+header{border-bottom:1px solid var(--rule);padding-bottom:28px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--vermilion);font-weight:700;margin:0 0 14px}
+h1{font-family:'Gowun Batang',serif;font-weight:700;margin:0 0 12px;
+  font-size:clamp(34px,7vw,56px);line-height:1.15;letter-spacing:-.01em}
+.sub{margin:0;max-width:44ch;color:var(--ink-soft);font-size:15.5px}
+
+/* 3×4 판 — 초기 배치를 그대로 그린 작은 판 */
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--lacquer);
+  padding:2px;width:132px;margin:34px 0 0;box-shadow:0 5px 0 #a87c46}
+.mini div{aspect-ratio:1/1.1;background:var(--wood);display:grid;place-items:center;
+  font-size:19px;line-height:1}
+.mini .up{transform:rotate(180deg)}
+
+.go{display:inline-flex;align-items:center;gap:12px;margin:40px 0 0;
+  background:var(--ink);color:var(--paper);text-decoration:none;
+  padding:15px 26px;border-radius:2px;font-weight:700;font-size:16px}
+.go:hover{background:var(--vermilion)}
+.go span{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
+  opacity:.65;font-weight:400}
+
+h2{font-family:'Gowun Batang',serif;font-size:21px;margin:56px 0 4px;font-weight:700}
+.lede{margin:0 0 20px;color:var(--ink-soft);font-size:14px}
+
+.list{margin:0;padding:0;list-style:none;border-top:1px solid var(--rule)}
+.list li{border-bottom:1px solid var(--rule)}
+.list a{display:flex;gap:16px;align-items:baseline;padding:15px 2px;
+  text-decoration:none;color:var(--ink)}
+.list a:hover{background:rgba(184,64,42,.07)}
+.list b{font-weight:700;font-size:15px;flex:0 0 auto;min-width:9.5em}
+.list em{font-style:normal;color:var(--ink-soft);font-size:13.5px}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:9px 12px 9px 0;border-bottom:1px solid var(--rule);
+  vertical-align:top}
+th{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--vermilion);font-weight:700}
+td:first-child{font-weight:700;white-space:nowrap;padding-right:22px}
+td{color:var(--ink-soft)}
+td strong{color:var(--ink);font-weight:700}
+
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--rule);
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8a7558;line-height:2}
+footer a{color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Dōbutsu Shōgi · 3×4</p>
+  <h1>동물쇼기</h1>
+  <p class="sub">기물은 다섯 종류, 판은 열두 칸. 태블릿을 눕혀놓고 마주 앉아 둡니다.</p>
+  <div class="mini" aria-label="초기 배치">
+    <div class="up">🦒</div><div class="up">🐯</div><div class="up">🐘</div>
+    <div></div><div class="up">🐥</div><div></div>
+    <div></div><div>🐥</div><div></div>
+    <div>🐘</div><div>🦁</div><div>🦒</div>
+  </div>
+  <a class="go" href="docs/design/motion.html">대국 시작 <span>PROTOTYPE</span></a>
+</header>
+
+<h2>규칙</h2>
+<p class="lede">일본 동물쇼기를 그대로 따릅니다. 기물에 찍힌 먹색 점이 곧 이동 방향입니다.</p>
+<table>
+  <tr><th>기물</th><th>움직임</th></tr>
+  <tr><td>사자 · 호랑이</td><td>8방향 1칸. 양쪽의 왕이고, 이것이 잡히면 진다</td></tr>
+  <tr><td>기린</td><td>상하좌우 1칸</td></tr>
+  <tr><td>코끼리</td><td>대각 4방향 1칸</td></tr>
+  <tr><td>병아리</td><td>앞 1칸. 상대 끝줄에 닿으면 <strong>닭</strong>으로 승격</td></tr>
+  <tr><td>닭</td><td>대각선 뒤 둘을 뺀 6방향 1칸</td></tr>
+</table>
+<table>
+  <tr><th>승패</th><th>조건</th></tr>
+  <tr><td>캐치</td><td>상대의 왕을 잡는다</td></tr>
+  <tr><td>트라이</td><td>내 왕이 상대 끝줄에 닿는다. 단 <strong>그 자리가 잡히는 자리가 아닐 것</strong></td></tr>
+  <tr><td>무승부</td><td>같은 국면이 세 번 반복된다</td></tr>
+</table>
+<p class="lede" style="margin-top:18px">잡은 기물은 자기 것이 되어 빈 칸 아무 곳에나 다시 놓을 수 있습니다. 같은 열에 병아리를 둘 놓아도, 맨 끝줄에 놓아도 됩니다 — 대신 놓은 병아리는 그 자리에서 승격하지 않습니다.</p>
+
+<h2>설계 기록</h2>
+<p class="lede">여기까지 오면서 검토한 것들. 고른 것과 버린 것이 같이 들어 있습니다.</p>
+<ul class="list">
+  <li><a href="docs/design/directions.html"><b>방향 3종</b><em>나무와 먹 / 원과 적목 / 밤과 빛 — 첫 갈림길</em></a></li>
+  <li><a href="docs/design/koma-test.html"><b>코마 적용</b><em>라인아트를 오각 코마에. CC0·Fluent Emoji와 비교</em></a></li>
+  <li><a href="docs/design/frames.html"><b>프레임과 표시</b><em>오각 6종 · 사각 3종 × 점 / 삼각형</em></a></li>
+  <li><a href="docs/design/wood.html"><b>나뭇결</b><em>무결부터 실사 목재 7종까지. 두 세트 전체 기물</em></a></li>
+  <li><a href="docs/rules.md"><b>규칙 문서</b><em>출처와 구현 확정 사항</em></a></li>
+</ul>
+
+<footer>
+  목재 텍스처 · <a href="https://polyhaven.com/textures/wood">Poly Haven</a>, CC0<br>
+  원작 · どうぶつしょうぎ — 규칙 키타오 마도카, 그림 후지타 마이코, 2008<br>
+  소스 · <a href="https://github.com/yoshi8867/dobutsu-shogi">github.com/yoshi8867/dobutsu-shogi</a>
+</footer>
+
+</div>
+</body>
+</html>
