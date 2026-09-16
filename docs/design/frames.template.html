@@ -1,0 +1,264 @@
+<title>코마 프레임과 방향 표시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@300;400;700;900&family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --wall:#17181a; --wall-2:#1f2124; --wall-line:#2e3136;
+  --chalk:#eceae5; --chalk-dim:#9b9892; --mark:#d8c07a;
+  --s1:8px; --s2:16px; --s3:28px; --s4:48px; --s5:76px;
+  --paper:#efe4cd; --ink:#241a10; --ink-soft:#6f5a41; --rule:#d3c0a0;
+  --wood:#e0bc80; --lacquer:#6b4a26;
+  --koma-me:#f4e3b8; --koma-you:#e8cf9f;
+  /* 프레임 형태 */
+  --sh-p1:polygon(50% 0%,88% 13%,100% 100%,0% 100%,12% 13%);
+  --sh-p2:polygon(50% 0%,93% 22%,100% 100%,0% 100%,7% 22%);
+  --sh-p3:polygon(50% 0%,80% 9%,100% 100%,0% 100%,20% 9%);
+  --sh-p4:polygon(50% 0%,100% 30%,100% 100%,0% 100%,0% 30%);
+  --sh-s3:polygon(18% 0%,82% 0%,100% 18%,100% 82%,82% 100%,18% 100%,0% 82%,0% 18%);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wall);color:var(--chalk);
+  font-family:'Gothic A1',system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s4) var(--s3) var(--s5)}
+.masthead{border-bottom:1px solid var(--wall-line);padding-bottom:var(--s3)}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mark);
+  font-weight:700;margin:0 0 var(--s2)}
+.masthead h1{font-family:'Gowun Batang',serif;font-weight:700;font-size:clamp(28px,4.4vw,48px);
+  line-height:1.2;margin:0 0 var(--s2);text-wrap:balance}
+.masthead p{max-width:64ch;margin:0;color:var(--chalk-dim);font-size:15px}
+.specs{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);margin-top:var(--s3);
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:#6b6864}
+.specs b{color:var(--chalk);font-weight:400}
+section.block{margin-top:var(--s5)}
+.block>h2{font-family:'Gowun Batang',serif;font-size:26px;margin:0 0 var(--s1);font-weight:700}
+.block>.lede{margin:0 0 var(--s3);max-width:68ch;color:var(--chalk-dim);font-size:14.5px}
+.paperplate{background:var(--paper);color:var(--ink);border-radius:2px;padding:var(--s3)}
+
+/* ════ 코마 ════ */
+.koma{position:relative;aspect-ratio:1/1.1;width:100%;
+  filter:drop-shadow(0 2px 1px rgba(60,35,10,.4));--boxy:20%}
+.koma.sq{aspect-ratio:1/1;--boxy:15%}
+.face{position:absolute;inset:0;clip-path:var(--sh,var(--sh-p1));
+  background:
+    repeating-linear-gradient(97deg,rgba(150,105,55,.10) 0 2px,rgba(150,105,55,0) 2px 9px),
+    linear-gradient(160deg,#fdf1cd 0%,var(--koma-bg,var(--koma-me)) 46%,#dfc088 100%)}
+.face.round{border-radius:11%;clip-path:none}
+.face.plain{clip-path:none}
+/* 동물을 둘러싼 가상의 정사각형 - 방향 표시는 전부 이 사각형에 고정된다 */
+.box{position:absolute;left:15%;width:70%;aspect-ratio:1;top:var(--boxy)}
+.box.guide{outline:1px dashed rgba(184,64,42,.55);outline-offset:0}
+.art{position:absolute;inset:0;transform:scale(var(--k,1));
+  -webkit-mask:var(--src) center/contain no-repeat;mask:var(--src) center/contain no-repeat;
+  background:var(--ink)}
+.m{position:absolute;width:var(--ms,3.6%);aspect-ratio:1;background:var(--mc,var(--ink));
+  transform:translate(-50%,-50%) rotate(var(--rot,0deg))}
+.m.dot{border-radius:50%}
+.m.tri{clip-path:polygon(50% 0%,100% 100%,0% 100%)}
+.n {left:50%;  top:0;    --rot:0deg}
+.ne{left:100%; top:0;    --rot:45deg}
+.e {left:100%; top:50%;  --rot:90deg}
+.se{left:100%; top:100%; --rot:135deg}
+.s {left:50%;  top:100%; --rot:180deg}
+.sw{left:0;    top:100%; --rot:225deg}
+.w {left:0;    top:50%;  --rot:270deg}
+.nw{left:0;    top:0;    --rot:315deg}
+/* 이전 방식: 프레임 테두리를 따라 흩어진 위치 */
+.old .n {left:50%;top:9%}   .old .ne{left:86%;top:16%} .old .e {left:91%;top:52%}
+.old .se{left:88%;top:88%}  .old .s {left:50%;top:93%} .old .sw{left:12%;top:88%}
+.old .w {left:9%;top:52%}   .old .nw{left:14%;top:16%}
+.koma.flip{transform:rotate(180deg)}
+
+/* ════ 격자 ════ */
+.rack{display:grid;gap:var(--s3) var(--s2);grid-template-columns:repeat(4,1fr)}
+.rack.six{grid-template-columns:repeat(6,1fr)}
+.rack.five{grid-template-columns:repeat(5,1fr)}
+@media (max-width:820px){.rack,.rack.six,.rack.five{grid-template-columns:repeat(3,1fr)}}
+.cellx{text-align:center}
+.cellx .komabox{width:min(112px,100%);margin:0 auto}
+.cellx b{display:block;font-size:13.5px;margin-top:10px;font-weight:700}
+.cellx span{display:block;font-size:11px;color:var(--ink-soft);
+  font-family:'JetBrains Mono',monospace;line-height:1.5}
+.cellx em{display:block;font-size:10.5px;color:#b8402a;font-weight:700;font-style:normal;
+  letter-spacing:.06em;margin-top:3px}
+
+/* ════ 보드 ════ */
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--s3)}
+.bwrap h3{margin:0 0 4px;font-size:15px;font-weight:700}
+.bwrap p{margin:0 0 var(--s2);font-size:12.5px;color:var(--ink-soft);min-height:3.2em}
+.miniboard{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--lacquer);
+  padding:2px;box-shadow:0 5px 0 #a87c46}
+.miniboard .sqr{background:var(--wood);display:grid;place-items:center;padding:6%;aspect-ratio:1}
+
+.notes{margin:var(--s3) 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--ink-soft)}
+.notes li{padding-left:15px;position:relative;margin-bottom:7px;max-width:72ch}
+.notes li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;
+  background:#b8402a;border-radius:1px}
+.notes b{color:var(--ink);font-weight:700}
+.qs{margin:var(--s3) 0 0;padding:0;list-style:none;display:grid;gap:var(--s2);
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.qs li{background:var(--wall-2);border-left:2px solid var(--mark);padding:var(--s2) var(--s2) var(--s2) 18px;
+  font-size:13.5px;color:var(--chalk-dim)}
+.qs b{display:block;color:var(--chalk);font-weight:700;margin-bottom:2px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <clipPath id="p1r" clipPathUnits="objectBoundingBox"><path d="M0.4338,0.0227 Q0.5000,0.0000 0.5662,0.0227 L0.8138,0.1073 Q0.8800,0.1300 0.8896,0.1993 L0.9904,0.9307 Q1.0000,1.0000 0.9300,1.0000 L0.0700,1.0000 Q0.0000,1.0000 0.0096,0.9307 L0.1104,0.1993 Q0.1200,0.1300 0.1862,0.1073 Z"/></clipPath>
+  <clipPath id="p2r" clipPathUnits="objectBoundingBox"><path d="M0.4466,0.0273 Q0.5000,0.0000 0.5534,0.0273 L0.8766,0.1927 Q0.9300,0.2200 0.9354,0.2798 L0.9946,0.9402 Q1.0000,1.0000 0.9400,1.0000 L0.0600,1.0000 Q0.0000,1.0000 0.0054,0.9402 L0.0646,0.2798 Q0.0700,0.2200 0.1234,0.1927 Z"/></clipPath>
+</defs></svg>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Direction A · Frame &amp; Marker Lab</p>
+  <h1>프레임과 방향 표시</h1>
+  <p>방향 점을 프레임 테두리가 아니라 <b>동물을 둘러싼 가상의 정사각형</b>에 고정했습니다. 꼭짓점 넷과 변 중앙 넷 — 여덟 자리가 모든 기물에서 같은 좌표입니다. 프레임 모양을 바꿔도 점은 움직이지 않습니다. 병아리는 작은 쪽으로 교체했고 크기도 줄였으며, 기린은 A로 확정했습니다.</p>
+  <div class="specs">
+    <span>기준 사각형 <b>코마 폭의 70%</b></span>
+    <span>점 색 <b>먹색 #241A10</b></span>
+    <span>프레임 <b>오각 6종 · 사각 3종</b></span>
+    <span>표시 <b>점 · 삼각형</b></span>
+  </div>
+</header>
+
+<section class="block">
+  <h2>1. 점 위치를 정리했습니다</h2>
+  <p class="lede">왼쪽이 지금까지 쓰던 방식 — 점을 오각형 테두리를 따라 하나씩 눈대중으로 놓아서 간격이 제각각이었습니다. 오른쪽이 새 방식입니다. 붉은 점선이 기준 사각형이고, 점 여덟 개가 그 꼭짓점과 변 중앙에 정확히 앉습니다.</p>
+  <div class="paperplate">
+    <div class="rack four">
+      <div class="cellx"><div class="komabox"><div class="koma old"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>이전</b><span>테두리 추종<br>간격 불균일</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box guide"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>기준 사각형</b><span>점선이 기준<br>꼭짓점 4 · 변중앙 4</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>확정안</b><span>점선 제거</span><em>사자 · 8방향</em></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m dot ne"></i><i class="m dot se"></i><i class="m dot sw"></i><i class="m dot nw"></i></div></div></div><b>대각선만</b><span>같은 좌표에서<br>넷만 켜짐</span><em>코끼리</em></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>2. 오각형 여섯 가지</h2>
+  <p class="lede">전부 같은 기물·같은 점 좌표입니다. 프레임 실루엣만 다릅니다.</p>
+  <div class="paperplate">
+    <div class="rack six">
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face" style="--sh:var(--sh-p1)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>P1 정통</b><span>실물 쇼기 코마<br>어깨 13%</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face" style="--sh:var(--sh-p2)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>P2 완만</b><span>어깨 22%<br>덜 뾰족함</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face" style="--sh:var(--sh-p3)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>P3 예각</b><span>어깨 9%<br>방향이 가장 셈</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face" style="--sh:var(--sh-p4)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>P4 집형</b><span>어깨 없음<br>면적이 가장 큼</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>P5 정통 라운드</b><span>P1 + 모서리 R<br>손맛이 부드러움</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face" style="--sh:url(#p2r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>P6 완만 라운드</b><span>P2 + 모서리 R<br>가장 순함</span></div>
+    </div>
+    <ul class="notes">
+      <li><b>P3은 어깨가 좁아</b> 위쪽 점 세 개(북·북동·북서)가 프레임 밖으로 조금 나갑니다. 이 안을 쓰려면 기준 사각형을 65%로 줄여야 합니다.</li>
+      <li><b>P4는 오각형이라기보다 오두막</b>입니다. 면적이 커서 그림은 가장 크게 들어가지만 쇼기 코마 느낌은 가장 옅습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>3. 사각형 세 가지</h2>
+  <p class="lede">오각형을 버리면 <b>방향이 형태로 읽히지 않습니다.</b> 그 몫을 점이나 삼각형이 전부 떠안게 되니, 표시를 더 크고 분명하게 가져가야 합니다.</p>
+  <div class="paperplate">
+    <div class="rack four">
+      <div class="cellx"><div class="komabox"><div class="koma sq"><div class="face plain"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>S1 정사각</b><span>모서리 각짐<br>가장 중립적</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma sq"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>S2 라운드</b><span>R 11%<br>타일 느낌</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma sq"><div class="face" style="--sh:var(--sh-s3)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>S3 모서리깎기</b><span>팔각<br>목재 가공 느낌</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma sq"><div class="face plain"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m tri n" style="--ms:6.5%"></i><i class="m tri ne" style="--ms:6.5%"></i><i class="m tri e" style="--ms:6.5%"></i><i class="m tri se" style="--ms:6.5%"></i><i class="m tri s" style="--ms:6.5%"></i><i class="m tri sw" style="--ms:6.5%"></i><i class="m tri w" style="--ms:6.5%"></i><i class="m tri nw" style="--ms:6.5%"></i></div></div></div><b>S1 + 삼각</b><span>사각형에서<br>방향을 되살린 경우</span><em>추천 조합</em></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>4. 점이냐 삼각형이냐</h2>
+  <p class="lede">전부 같은 프레임(P1), 같은 여덟 좌표입니다. 크기와 도형만 다릅니다.</p>
+  <div class="paperplate">
+    <div class="rack five">
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n" style="--ms:5.5%"></i><i class="m dot ne" style="--ms:5.5%"></i><i class="m dot e" style="--ms:5.5%"></i><i class="m dot se" style="--ms:5.5%"></i><i class="m dot s" style="--ms:5.5%"></i><i class="m dot sw" style="--ms:5.5%"></i><i class="m dot w" style="--ms:5.5%"></i><i class="m dot nw" style="--ms:5.5%"></i></div></div></div><b>점 · 큼</b><span>5.5%<br>이전 크기</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div><b>점 · 중간</b><span>3.6%</span><em>기본값</em></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n" style="--ms:2.5%"></i><i class="m dot ne" style="--ms:2.5%"></i><i class="m dot e" style="--ms:2.5%"></i><i class="m dot se" style="--ms:2.5%"></i><i class="m dot s" style="--ms:2.5%"></i><i class="m dot sw" style="--ms:2.5%"></i><i class="m dot w" style="--ms:2.5%"></i><i class="m dot nw" style="--ms:2.5%"></i></div></div></div><b>점 · 작음</b><span>2.5%<br>태블릿에서 한계</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m tri n" style="--ms:5%"></i><i class="m tri ne" style="--ms:5%"></i><i class="m tri e" style="--ms:5%"></i><i class="m tri se" style="--ms:5%"></i><i class="m tri s" style="--ms:5%"></i><i class="m tri sw" style="--ms:5%"></i><i class="m tri w" style="--ms:5%"></i><i class="m tri nw" style="--ms:5%"></i></div></div></div><b>삼각 · 작음</b><span>5%<br>바깥을 향함</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div><b>삼각 · 큼</b><span>7%</span><em>추천</em></div>
+    </div>
+    <ul class="notes">
+      <li><b>삼각형은 정보를 하나 더 실어 나릅니다.</b> 점은 "저쪽에 갈 수 있다"만 말하지만 삼각형은 뾰족한 끝이 방향을 가리킵니다. 대각선 넷이 특히 달라집니다 — 점일 때는 코너 장식처럼 보이던 것이 삼각형이면 확실히 화살표로 읽힙니다.</li>
+      <li><b>점은 원작에 충실합니다.</b> 실물 동물쇼기가 붉은 점이니, 원작을 아는 사람에게는 점이 맞습니다. 색을 먹색으로 낮춘 지금은 판에서 튀지도 않습니다.</li>
+      <li><b>대각선 삼각형의 회전은 45°</b>라 픽셀 그리드에 안 맞아 미세하게 흐려 보일 수 있습니다. 실제 기기에서 확인이 필요한 부분입니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>5. 여섯 기물, 확정 크기</h2>
+  <p class="lede">병아리는 작은 쪽(2행 2열)으로 바꾸고 기준 사각형의 66%까지 줄였습니다. 기린은 A, 목 길이 때문에 90%로 낮췄습니다. 점 좌표는 여섯 장 모두 동일합니다.</p>
+  <div class="paperplate">
+    <div class="rack six">
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div><b>사자</b><span>100%</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma" style="--koma-bg:var(--koma-you)"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/tiger.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div><b>호랑이</b><span>100%</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i></div></div></div><b>기린</b><span>90% · A안</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div><b>코끼리</b><span>100%</span></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/chick-b.png);--k:.66"></i><i class="m tri n" style="--ms:7%"></i></div></div></div><b>병아리</b><span>66% · 작은쪽</span><em>교체 완료</em></div>
+      <div class="cellx"><div class="komabox"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/rooster.png);--k:.95"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div><b>닭</b><span>95%</span></div>
+    </div>
+    <ul class="notes">
+      <li><b>병아리가 작아지니 서열이 생깁니다.</b> 사자·호랑이가 가장 크고 병아리가 가장 작아서, 크기만 봐도 말의 값어치가 읽힙니다. 승격해 닭이 되면 커지는 것도 규칙과 맞습니다.</li>
+      <li><b>기준 사각형은 그대로 두고 그림만 줄였습니다.</b> 그래서 병아리가 작아져도 방향 표시는 다른 기물과 같은 자리에 있습니다 — 이게 격자를 유지하는 방법입니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>6. 판 위에서</h2>
+  <p class="lede">초기 배치 두 줄. 프레임과 표시 조합을 바꿔가며 같은 배치를 그렸습니다.</p>
+  <div class="paperplate">
+    <div class="boards">
+      <div class="bwrap">
+        <h3>P1 정통 + 점</h3>
+        <p>원작에 가장 가깝습니다. 점이 먹색이라 판과 한 계열로 가라앉습니다.</p>
+        <div class="miniboard">
+          <div class="sqr"><div class="koma flip" style="--koma-bg:var(--koma-you)"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m dot n"></i><i class="m dot e"></i><i class="m dot s"></i><i class="m dot w"></i></div></div></div>
+          <div class="sqr"><div class="koma flip" style="--koma-bg:var(--koma-you)"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/tiger.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div>
+          <div class="sqr"><div class="koma flip" style="--koma-bg:var(--koma-you)"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m dot ne"></i><i class="m dot se"></i><i class="m dot sw"></i><i class="m dot nw"></i></div></div></div>
+          <div class="sqr"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m dot ne"></i><i class="m dot se"></i><i class="m dot sw"></i><i class="m dot nw"></i></div></div></div>
+          <div class="sqr"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m dot n"></i><i class="m dot ne"></i><i class="m dot e"></i><i class="m dot se"></i><i class="m dot s"></i><i class="m dot sw"></i><i class="m dot w"></i><i class="m dot nw"></i></div></div></div>
+          <div class="sqr"><div class="koma"><div class="face"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m dot n"></i><i class="m dot e"></i><i class="m dot s"></i><i class="m dot w"></i></div></div></div>
+        </div>
+      </div>
+
+      <div class="bwrap">
+        <h3>P5 라운드 오각 + 삼각</h3>
+        <p>모서리가 둥글어 태블릿 UI와 덜 싸우고, 삼각형이 방향을 확실히 말합니다.</p>
+        <div class="miniboard">
+          <div class="sqr"><div class="koma flip" style="--koma-bg:var(--koma-you)"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma flip" style="--koma-bg:var(--koma-you)"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/tiger.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma flip" style="--koma-bg:var(--koma-you)"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma"><div class="face" style="--sh:url(#p1r)"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i></div></div></div>
+        </div>
+      </div>
+
+      <div class="bwrap">
+        <h3>S2 라운드 사각 + 삼각</h3>
+        <p>오각형을 버린 경우. 삼각형이 없으면 어느 쪽이 내 말인지 형태로는 알 수 없습니다.</p>
+        <div class="miniboard">
+          <div class="sqr"><div class="koma sq flip" style="--koma-bg:var(--koma-you)"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma sq flip" style="--koma-bg:var(--koma-you)"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/tiger.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma sq flip" style="--koma-bg:var(--koma-you)"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma sq"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma sq"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/lion.png)"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri ne" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri se" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri sw" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i><i class="m tri nw" style="--ms:7%"></i></div></div></div>
+          <div class="sqr"><div class="koma sq"><div class="face round"></div><div class="box"><i class="art" style="--src:url(ASSET:pieces/giraffe-a.png);--k:.9"></i><i class="m tri n" style="--ms:7%"></i><i class="m tri e" style="--ms:7%"></i><i class="m tri s" style="--ms:7%"></i><i class="m tri w" style="--ms:7%"></i></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>정할 것</h2>
+  <ul class="qs">
+    <li><b>프레임</b>P1~P6 / S1~S3 중 하나. 제 추천은 P5(정통 라운드) — 실물 코마의 실루엣을 지키면서 태블릿에서 모서리가 덜 날카롭습니다.</li>
+    <li><b>표시 도형</b>점이냐 삼각형이냐. 원작 충실이면 점, 규칙 학습 효과면 삼각형입니다.</li>
+    <li><b>표시 크기</b>점은 3.6%, 삼각은 7%를 기본으로 잡아뒀습니다. 더 줄일지 키울지.</li>
+    <li><b>기준 사각형</b>지금 코마 폭의 70%입니다. P3를 고르시면 65%로 줄여야 합니다.</li>
+  </ul>
+</section>
+
+</div>

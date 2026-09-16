@@ -1,0 +1,358 @@
+<title>오각 코마 적용 테스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@300;400;700;900&family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --wall:#17181a; --wall-2:#1f2124; --wall-line:#2e3136;
+  --chalk:#eceae5; --chalk-dim:#9b9892; --mark:#d8c07a;
+  --s1:8px; --s2:16px; --s3:28px; --s4:48px; --s5:76px;
+  /* 방향 A 팔레트 */
+  --paper:#efe4cd; --ink:#241a10; --ink-soft:#6f5a41; --rule:#d3c0a0;
+  --wood:#e0bc80; --wood-dark:#c9a163; --lacquer:#6b4a26;
+  --koma-me:#f4e3b8; --koma-you:#e8cf9f; --vermilion:#b8402a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wall);color:var(--chalk);
+  font-family:'Gothic A1',system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s4) var(--s3) var(--s5)}
+
+.masthead{border-bottom:1px solid var(--wall-line);padding-bottom:var(--s3)}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mark);
+  font-weight:700;margin:0 0 var(--s2)}
+.masthead h1{font-family:'Gowun Batang',serif;font-weight:700;font-size:clamp(28px,4.4vw,48px);
+  line-height:1.2;margin:0 0 var(--s2);text-wrap:balance}
+.masthead p{max-width:64ch;margin:0;color:var(--chalk-dim);font-size:15px}
+.specs{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);margin-top:var(--s3);
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:#6b6864}
+.specs b{color:var(--chalk);font-weight:400}
+
+section.block{margin-top:var(--s5)}
+.block>h2{font-family:'Gowun Batang',serif;font-size:26px;margin:0 0 var(--s1);font-weight:700}
+.block>.lede{margin:0 0 var(--s3);max-width:66ch;color:var(--chalk-dim);font-size:14.5px}
+.paperplate{background:var(--paper);color:var(--ink);border-radius:2px;padding:var(--s3)}
+
+/* ── 코마 ── */
+.koma{position:relative;aspect-ratio:1/1.1;width:100%;
+  filter:drop-shadow(0 2px 1px rgba(60,35,10,.4))}
+.koma-face{position:absolute;inset:0;
+  clip-path:polygon(50% 0%,88% 13%,100% 100%,0% 100%,12% 13%);
+  background:
+    repeating-linear-gradient(97deg,rgba(150,105,55,.10) 0 2px,rgba(150,105,55,0) 2px 9px),
+    linear-gradient(160deg,#fdf1cd 0%,var(--koma-bg,var(--koma-me)) 46%,#dfc088 100%)}
+.koma .ani{position:absolute;left:14%;top:18%;width:72%;height:68%;
+  -webkit-mask:var(--src) center/contain no-repeat;mask:var(--src) center/contain no-repeat;
+  background:var(--ink)}
+.koma.flip{transform:rotate(180deg)}
+.pip{display:none;position:absolute;width:7.5%;aspect-ratio:1;border-radius:50%;
+  background:var(--vermilion);transform:translate(-50%,-50%)}
+.koma[data-d~="n"]  .pip.n {display:block;left:50%;top:9%}
+.koma[data-d~="ne"] .pip.ne{display:block;left:86%;top:16%}
+.koma[data-d~="e"]  .pip.e {display:block;left:91%;top:52%}
+.koma[data-d~="se"] .pip.se{display:block;left:88%;top:88%}
+.koma[data-d~="s"]  .pip.s {display:block;left:50%;top:93%}
+.koma[data-d~="sw"] .pip.sw{display:block;left:12%;top:88%}
+.koma[data-d~="w"]  .pip.w {display:block;left:9%;top:52%}
+.koma[data-d~="nw"] .pip.nw{display:block;left:14%;top:16%}
+.nopips .pip{display:none !important}
+
+/* ── 태블릿 목업 ── */
+.tablet{background:#0b0b0c;border-radius:20px;padding:11px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.screen{aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#e7d6b2;
+  display:grid;grid-template-columns:1fr auto 1fr;gap:2%;padding:2.4%}
+.tray{display:flex;flex-direction:column;gap:6px;min-width:0}
+.tray.mine{justify-content:flex-end;align-items:flex-end;text-align:right}
+.tray-label{font-size:10px;letter-spacing:.14em;color:#8a6f4e;font-weight:700;
+  text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.tray-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.2}
+.held{display:flex;gap:6px}
+.held .koma{width:min(50px,4.4vw)}
+.turn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:999px;background:var(--ink);color:#f0e0bb;
+  font-family:'JetBrains Mono',monospace}
+.turn::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.board-area{display:flex;align-items:center;justify-content:center;min-width:0}
+.board{display:grid;grid-template-columns:repeat(3,1fr);aspect-ratio:3/4;height:100%;
+  gap:2px;background:var(--lacquer);padding:2px;border-radius:3px;
+  box-shadow:0 6px 0 #a87c46,0 12px 20px rgba(60,35,10,.4)}
+.cell{background:var(--wood);display:grid;place-items:center;position:relative;padding:5%}
+.cell.sel{background:#d6a95f}
+.cell.trail{background:#dbb374}
+.cell.move::after{content:"";position:absolute;width:26%;aspect-ratio:1;border-radius:50%;
+  background:rgba(184,64,42,.5)}
+.cell .koma{width:100%}
+
+/* ── 기물 스트립 ── */
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--s2)}
+.strip .item{text-align:center}
+.strip .komabox{width:min(104px,100%);margin:0 auto}
+.strip b{display:block;font-size:13.5px;margin-top:10px;font-weight:700}
+.strip span{display:block;font-size:11px;color:var(--ink-soft);font-family:'JetBrains Mono',monospace}
+.strip .side{display:block;font-size:10.5px;color:var(--vermilion);font-weight:700;letter-spacing:.06em}
+
+/* ── 비교 격자 ── */
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--s2)}
+.cmp{text-align:center}
+.cmp .komabox{width:min(110px,100%);margin:0 auto}
+.cmp figcaption{font-size:11.5px;color:var(--ink-soft);margin-top:8px;
+  font-family:'JetBrains Mono',monospace;line-height:1.45}
+.cmp figcaption b{display:block;color:var(--ink);font-size:13px;font-family:'Gothic A1',sans-serif}
+.koma .raw{position:absolute;left:14%;top:18%;width:72%;height:68%;object-fit:contain}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+@media (max-width:760px){.split{grid-template-columns:1fr}.strip{grid-template-columns:repeat(3,1fr)}}
+.split h3{margin:0 0 var(--s1);font-size:15px;font-weight:700}
+.split p{margin:0 0 var(--s2);font-size:13px;color:var(--ink-soft)}
+.miniboard{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--lacquer);
+  padding:2px;max-width:270px;box-shadow:0 5px 0 #a87c46}
+.miniboard .cell{padding:6%}
+
+.notes{margin:var(--s3) 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--ink-soft)}
+.notes li{padding-left:15px;position:relative;margin-bottom:7px;max-width:70ch}
+.notes li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;
+  background:var(--vermilion);border-radius:1px}
+.notes b{color:var(--ink);font-weight:700}
+
+.verdict{margin-top:var(--s3);border-top:1px solid var(--rule);padding-top:var(--s2);
+  font-size:13.5px;color:var(--ink-soft);max-width:72ch}
+.verdict b{color:var(--ink)}
+
+.qs{margin:var(--s3) 0 0;padding:0;list-style:none;display:grid;gap:var(--s2);
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.qs li{background:var(--wall-2);border-left:2px solid var(--mark);padding:var(--s2) var(--s2) var(--s2) 18px;
+  font-size:13.5px;color:var(--chalk-dim)}
+.qs b{display:block;color:var(--chalk);font-weight:700;margin-bottom:2px}
+.credit{margin-top:var(--s4);font-size:12px;color:#6b6864;font-family:'JetBrains Mono',monospace;
+  border-top:1px solid var(--wall-line);padding-top:var(--s2);line-height:1.8}
+.credit a{color:var(--chalk-dim)}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Direction A · Koma Fitting Test</p>
+  <h1>오각 코마에 얹어보기</h1>
+  <p>보내주신 라인아트 8종을 잘라 배경을 빼고, 알파 마스크로 바꿔 오동나무 오각 코마에 올렸습니다. 먹색은 CSS에서 결정되므로 원본 청록색에 묶이지 않습니다. 아래는 같은 코마에 CC0 실루엣과 Fluent Emoji를 얹은 비교입니다.</p>
+  <div class="specs">
+    <span>소재 <b>사용자 제공 8종 × 2세트</b></span>
+    <span>처리 <b>프레임 제거 · 알파 추출 · 320px 정사각</b></span>
+    <span>진영 <b>사자 vs 호랑이</b></span>
+    <span>먹색 <b>#241A10 (CSS 변수)</b></span>
+    <span>이스터에그 <b>BATTLE BEASTS</b></span>
+  </div>
+</header>
+
+<section class="block">
+  <h2>1. 실제 화면</h2>
+  <p class="lede">중반전. 아래가 사자 진영(나), 위가 호랑이 진영(상대). 왼쪽 위·오른쪽 아래가 손패이고, 선택한 코끼리의 이동 가능 칸에 붉은 점이 찍혀 있습니다.</p>
+  <div class="tablet"><div class="screen">
+    <div class="tray theirs">
+      <span class="tray-label">상대 손패</span>
+      <span class="tray-name">호랑이 진영</span>
+      <div class="held">
+        <div class="koma flip" data-d="n e s w" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i><i class="pip n"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i></div>
+      </div>
+    </div>
+    <div class="board-area"><div class="board">
+      <div class="cell"><div class="koma flip" data-d="n e s w" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i><i class="pip n"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i></div></div>
+      <div class="cell"><div class="koma flip" data-d="n ne e se s sw w nw" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/tiger.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip se"></i><i class="pip s"></i><i class="pip sw"></i><i class="pip w"></i><i class="pip nw"></i></div></div>
+      <div class="cell"></div>
+
+      <div class="cell"></div>
+      <div class="cell"><div class="koma" data-d="n ne e s w nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/rooster.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i><i class="pip nw"></i></div></div>
+      <div class="cell trail"></div>
+
+      <div class="cell"></div>
+      <div class="cell move"></div>
+      <div class="cell trail"><div class="koma flip" data-d="n" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/chick-a.png)"></i><i class="pip n"></i></div></div>
+
+      <div class="cell sel"><div class="koma" data-d="ne se sw nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="pip ne"></i><i class="pip se"></i><i class="pip sw"></i><i class="pip nw"></i></div></div>
+      <div class="cell"><div class="koma" data-d="n ne e se s sw w nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/lion.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip se"></i><i class="pip s"></i><i class="pip sw"></i><i class="pip w"></i><i class="pip nw"></i></div></div>
+      <div class="cell"></div>
+    </div></div>
+    <div class="tray mine">
+      <span class="turn">내 차례</span>
+      <span class="tray-name">사자 진영</span>
+      <div class="held">
+        <div class="koma" data-d="ne se sw nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="pip ne"></i><i class="pip se"></i><i class="pip sw"></i><i class="pip nw"></i></div>
+      </div>
+      <span class="tray-label">내 손패</span>
+    </div>
+  </div></div>
+</section>
+
+<section class="block">
+  <h2>2. 코마 여섯 장</h2>
+  <p class="lede">붉은 점이 그 기물의 이동 방향입니다. 사자와 호랑이는 같은 왕이고 진영만 다릅니다.</p>
+  <div class="paperplate">
+    <div class="strip">
+      <div class="item"><div class="komabox"><div class="koma" data-d="n ne e se s sw w nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/lion.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip se"></i><i class="pip s"></i><i class="pip sw"></i><i class="pip w"></i><i class="pip nw"></i></div></div><b>사자</b><span>8방향</span><em class="side">사자 진영 왕</em></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n ne e se s sw w nw" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/tiger.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip se"></i><i class="pip s"></i><i class="pip sw"></i><i class="pip w"></i><i class="pip nw"></i></div></div><b>호랑이</b><span>8방향</span><em class="side">호랑이 진영 왕</em></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n e s w"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i><i class="pip n"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i></div></div><b>기린</b><span>상하좌우</span><em class="side">공통</em></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="ne se sw nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i><i class="pip ne"></i><i class="pip se"></i><i class="pip sw"></i><i class="pip nw"></i></div></div><b>코끼리</b><span>대각 4방향</span><em class="side">공통</em></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/chick-a.png)"></i><i class="pip n"></i></div></div><b>병아리</b><span>앞 1칸</span><em class="side">공통</em></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n ne e s w nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/rooster.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i><i class="pip nw"></i></div></div><b>닭</b><span>대각 뒤 제외 6방향</span><em class="side">병아리 승격</em></div>
+    </div>
+    <ul class="notes">
+      <li><b>기린의 목</b>이 세로로 길어 코마 위쪽 좁은 구간에 머리가 걸립니다. 다른 다섯보다 5~8% 작게 넣어야 균형이 맞습니다 — 현재는 전부 같은 크기라 기린만 커 보입니다.</li>
+      <li><b>닭(수탉)</b>은 가로로 긴 옆모습이라 정사각 코마에서 여백이 위아래로 남습니다. 병아리와 나란히 놓았을 때 계열이 달라 보이는 유일한 장이니 확인해 주세요.</li>
+      <li><b>보내주신 그림에 여분이 있습니다</b> — 병아리 2종, 기린 2종. 아래 4번에서 나란히 비교했습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>3. 진영을 무엇으로 구분할까</h2>
+  <p class="lede">사자·호랑이가 갈리는 건 왕뿐입니다. 기린·코끼리·병아리·닭은 양쪽이 같은 그림이라 여전히 방향에만 의존합니다.</p>
+  <div class="paperplate">
+    <div class="split">
+      <div>
+        <h3>방향만으로 (원작 그대로)</h3>
+        <p>코마 색이 양쪽 동일. 판을 돌려 앉는 실물 감각이 남지만, 태블릿에서 한쪽만 보고 있으면 순간적으로 헷갈립니다.</p>
+        <div class="miniboard">
+          <div class="cell"><div class="koma flip nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i></div></div>
+          <div class="cell"><div class="koma flip nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/tiger.png)"></i></div></div>
+          <div class="cell"><div class="koma flip nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/lion.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i></div></div>
+        </div>
+      </div>
+      <div>
+        <h3>코마 나뭇결까지 (제안)</h3>
+        <p>상대 코마를 한 톤 어둡게. 오동나무와 벚나무 두 재료를 쓴 것처럼 읽히므로 세계관을 깨지 않으면서 진영이 즉시 갈립니다.</p>
+        <div class="miniboard">
+          <div class="cell"><div class="koma flip nopips" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i></div></div>
+          <div class="cell"><div class="koma flip nopips" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/tiger.png)"></i></div></div>
+          <div class="cell"><div class="koma flip nopips" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/elephant.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/lion.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>4. 여분 두 장</h2>
+  <p class="lede">병아리와 기린은 보내주신 그림에 두 벌씩 있습니다. 같은 조건으로 올렸으니 고르시면 됩니다.</p>
+  <div class="paperplate">
+    <div class="compare">
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/chick-a.png)"></i></div></div><figcaption><b>병아리 A</b>크게, 정면<br>날개가 보임</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/chick-b.png)"></i></div></div><figcaption><b>병아리 B</b>작게, 옆으로<br>선이 더 간결</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-a.png)"></i></div></div><figcaption><b>기린 A</b>몸통이 굵음<br>작게 줄여도 버팀</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces/giraffe-b.png)"></i></div></div><figcaption><b>기린 B</b>목이 더 김<br>꼬리 끝이 흐림</figcaption></figure>
+    </div>
+    <div class="verdict"><b>추천:</b> 병아리 A(정면이라 닭과 계열이 맞고, 작은 칸에서 실루엣이 덩어리로 읽힙니다), 기린 A(B는 꼬리 끝에 원본의 흐린 회색이 남아 먹색으로 바꿀 때 얼룩집니다).</div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>5. 대안 소스를 같은 코마에</h2>
+  <p class="lede">지난번에 말씀드린 3번(CC0 실루엣)과 4번(Fluent Emoji, MIT)을 실제로 받아서 같은 코마에 올렸습니다.</p>
+  <div class="paperplate">
+    <h3 style="margin:0 0 4px;font-size:15px">Fluent Emoji · MIT · 원본 컬러</h3>
+    <p style="margin:0 0 16px;font-size:13px;color:var(--ink-soft)">6종이 한 팩에 다 있습니다. 라이선스도 가장 편합니다. 다만 나무판 위에서 색이 따로 놉니다.</p>
+    <div class="compare">
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><img class="raw" src="ASSET:alt/fluent-lion-color.svg" alt="Fluent Emoji 사자"></div></div><figcaption><b>사자</b>🦁 얼굴만</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><img class="raw" src="ASSET:alt/fluent-tiger-color.svg" alt="Fluent Emoji 호랑이"></div></div><figcaption><b>호랑이</b>🐯 얼굴만</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><img class="raw" src="ASSET:alt/fluent-giraffe-color.svg" alt="Fluent Emoji 기린"></div></div><figcaption><b>기린</b>🦒 전신</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><img class="raw" src="ASSET:alt/fluent-elephant-color.svg" alt="Fluent Emoji 코끼리"></div></div><figcaption><b>코끼리</b>🐘 전신</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><img class="raw" src="ASSET:alt/fluent-chick-color.svg" alt="Fluent Emoji 병아리"></div></div><figcaption><b>병아리</b>🐥 전신</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><img class="raw" src="ASSET:alt/fluent-hen-color.svg" alt="Fluent Emoji 닭"></div></div><figcaption><b>닭</b>🐔 전신</figcaption></figure>
+    </div>
+
+    <h3 style="margin:32px 0 4px;font-size:15px">Fluent Emoji · 고대비 버전을 먹색으로</h3>
+    <p style="margin:0 0 16px;font-size:13px;color:var(--ink-soft)">같은 팩에 흑백 라인 버전이 들어 있어 보내주신 그림과 같은 방식으로 먹색화가 됩니다. 판과는 붙지만 선이 굵고 표정이 없습니다.</p>
+    <div class="compare">
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/fluent-lion-hc.svg)"></i></div></div><figcaption><b>사자</b>고대비</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/fluent-tiger-hc.svg)"></i></div></div><figcaption><b>호랑이</b>고대비</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/fluent-giraffe-hc.svg)"></i></div></div><figcaption><b>기린</b>고대비</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/fluent-elephant-hc.svg)"></i></div></div><figcaption><b>코끼리</b>고대비</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/fluent-chick-hc.svg)"></i></div></div><figcaption><b>병아리</b>고대비</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/fluent-hen-hc.svg)"></i></div></div><figcaption><b>닭</b>고대비</figcaption></figure>
+    </div>
+
+    <h3 style="margin:32px 0 4px;font-size:15px">CC0 / 퍼블릭 도메인 실루엣</h3>
+    <p style="margin:0 0 16px;font-size:13px;color:var(--ink-soft)">위키미디어 공용에서 라이선스를 CC0·퍼블릭 도메인으로 좁혀 받은 것들입니다. 실루엣이라 먹색화는 완벽하지만, <b>여섯 종이 채워지지 않았습니다.</b></p>
+    <div class="compare">
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/cc0-lion.png)"></i></div></div><figcaption><b>사자</b>NIH BioArt · PD</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/cc0-hen.png)"></i></div></div><figcaption><b>닭</b>Chicken silhouette · PD</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:alt/cc0-elephant.png)"></i></div></div><figcaption><b>코끼리</b>Elephant Vector · CC0</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips" style="opacity:.32"><div class="koma-face"></div></div></div><figcaption><b>호랑이</b>결과 없음</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips" style="opacity:.32"><div class="koma-face"></div></div></div><figcaption><b>병아리</b>결과 없음</figcaption></figure>
+      <figure class="cmp"><div class="komabox"><div class="koma nopips" style="opacity:.32"><div class="koma-face"></div></div></div><figcaption><b>기린</b>쓸 만한 것 없음</figcaption></figure>
+    </div>
+
+    <ul class="notes">
+      <li><b>CC0는 여섯 종을 못 채웁니다.</b> 호랑이·병아리는 CC0/PD로 좁히면 SVG 결과가 0건이고, 기린은 검색에 걸린 한 건이 공룡 골격도였습니다. 게다가 세 종이 각각 다른 작가라 굵기도 시점도 따로 놉니다 — 세트로 쓸 수 없습니다.</li>
+      <li><b>Fluent Emoji는 세트는 되지만 프레이밍이 안 맞습니다.</b> 사자·호랑이만 얼굴이고 나머지는 전신이라, 한 판에 올리면 사자만 확대된 것처럼 보입니다. 이모지 규격의 한계라 고칠 방법이 없습니다.</li>
+      <li><b>보내주신 세트가 이깁니다.</b> 여덟 장이 한 손에서 나와 선 굵기·눈 크기·둥글기가 같고, 여섯 종 전부 정면 계열이며, 라이선스 문제도 없습니다. 위 두 비교는 이걸 확인하려고 붙였습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>6. 이스터에그 · BATTLE BEASTS</h2>
+  <p class="lede">두 번째로 보내주신 펜화 세트를 같은 파이프라인에 넣었습니다. 해칭의 농담이 그대로 알파로 살아나서, 먹색으로 바꾸면 <b>코마에 판화를 박아 넣은 것처럼</b> 보입니다. 판과 코마를 호두나무 톤으로 낮춰 기본 모드와 구분했습니다.</p>
+  <div class="paperplate" style="--koma-me:#d8b478;--koma-you:#c49a5e;--wood:#b8884c;--lacquer:#3d2611;background:#e4d3b3">
+    <div class="strip">
+      <div class="item"><div class="komabox"><div class="koma" data-d="n ne e se s sw w nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/lion.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip se"></i><i class="pip s"></i><i class="pip sw"></i><i class="pip w"></i><i class="pip nw"></i></div></div><b>사자</b><span>8방향</span></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n ne e se s sw w nw" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/tiger.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip se"></i><i class="pip s"></i><i class="pip sw"></i><i class="pip w"></i><i class="pip nw"></i></div></div><b>호랑이</b><span>8방향</span></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n e s w"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/giraffe-b.png)"></i><i class="pip n"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i></div></div><b>기린</b><span>상하좌우</span></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="ne se sw nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/elephant.png)"></i><i class="pip ne"></i><i class="pip se"></i><i class="pip sw"></i><i class="pip nw"></i></div></div><b>코끼리</b><span>대각 4방향</span></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/chick-b.png)"></i><i class="pip n"></i></div></div><b>병아리</b><span>앞 1칸</span></div>
+      <div class="item"><div class="komabox"><div class="koma" data-d="n ne e s w nw"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/rooster.png)"></i><i class="pip n"></i><i class="pip ne"></i><i class="pip e"></i><i class="pip s"></i><i class="pip w"></i><i class="pip nw"></i></div></div><b>닭</b><span>대각 뒤 제외 6방향</span></div>
+    </div>
+
+    <div class="split" style="margin-top:28px">
+      <div>
+        <h3>판 위에서</h3>
+        <p>같은 초기 배치 한 줄. 정면을 노려보는 얼굴들이라 3cm 칸에서도 사자·호랑이가 확실히 갈립니다 — 기본 세트보다 오히려 구분이 쉽습니다.</p>
+        <div class="miniboard">
+          <div class="cell"><div class="koma flip nopips" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/giraffe-b.png)"></i></div></div>
+          <div class="cell"><div class="koma flip nopips" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/tiger.png)"></i></div></div>
+          <div class="cell"><div class="koma flip nopips" style="--koma-bg:var(--koma-you)"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/elephant.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/elephant.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/lion.png)"></i></div></div>
+          <div class="cell"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/giraffe-b.png)"></i></div></div>
+        </div>
+      </div>
+      <div>
+        <h3>여분 두 장</h3>
+        <p>이쪽도 병아리·기린이 두 벌입니다. 기린은 정면(B)이 사자·호랑이와 시점이 맞아 위에 썼고, 병아리는 정면(B)이 더 사납습니다.</p>
+        <div class="compare" style="grid-template-columns:repeat(4,1fr)">
+          <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/chick-a.png)"></i></div></div><figcaption><b>병아리 A</b>옆모습</figcaption></figure>
+          <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/chick-b.png)"></i></div></div><figcaption><b>병아리 B</b>정면</figcaption></figure>
+          <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/giraffe-a.png)"></i></div></div><figcaption><b>기린 A</b>옆모습</figcaption></figure>
+          <figure class="cmp"><div class="komabox"><div class="koma nopips"><div class="koma-face"></div><i class="ani" style="--src:url(ASSET:pieces-x/giraffe-b.png)"></i></div></div><figcaption><b>기린 B</b>정면</figcaption></figure>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li><b>전환 조건을 정해야 합니다.</b> 보통은 숨긴 입력(제목 화면 로고 7번 탭)이나 조건 달성(연승, 트라이 승리) 중 하나입니다. 어느 쪽이 좋으신지.</li>
+      <li><b>두 세트가 규격이 같습니다.</b> 같은 8칸 배치·같은 크롭이라 파일명만 바꿔 끼우면 됩니다. 런타임에 폴더 하나만 갈아끼우는 구조로 가면 코드가 늘지 않습니다.</li>
+      <li><b>사자·코끼리·호랑이는 원본이 칸을 꽉 채웁니다.</b> 코마 안에서 네모난 덩어리로 보이는 게 그래서인데, 지금은 오히려 판목을 박아 넣은 느낌이라 살려뒀습니다. 여백을 더 주길 원하시면 잘라내겠습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>다음에 정할 것</h2>
+  <ul class="qs">
+    <li><b>여분 선택</b>병아리 A/B, 기린 A/B 중 어느 쪽인지.</li>
+    <li><b>진영 구분</b>방향만 vs 코마 색 두 톤. 3번 섹션을 보고 정해 주세요.</li>
+    <li><b>기린 크기</b>혼자 커 보이는 문제 — 기린만 줄일지, 전부 같은 크기를 유지할지.</li>
+    <li><b>해상도</b>지금은 320px 알파 마스크입니다. 태블릿 고해상도까지 보면 512px로 다시 뽑거나, 원본을 더 큰 크기로 다시 생성하는 편이 낫습니다.</li>
+  </ul>
+</section>
+
+<p class="credit">
+소재 · 사용자 제공 이미지(Gemini 생성) 2세트 × 8종 — 프레임 제거, 알파 추출, 먹색 치환은 CSS 마스크로 처리.<br>
+비교용 · Fluent Emoji © Microsoft, MIT License — <a href="https://github.com/microsoft/fluentui-emoji">github.com/microsoft/fluentui-emoji</a><br>
+비교용 · Wikimedia Commons, 퍼블릭 도메인 / CC0 — NIH BioArt, Chicken silhouette 02, Elephant Vector
+</p>
+
+</div>

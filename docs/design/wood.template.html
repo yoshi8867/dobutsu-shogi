@@ -1,0 +1,370 @@
+<title>나뭇결과 전체 기물</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@300;400;700;900&family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --wall:#17181a; --wall-2:#1f2124; --wall-line:#2e3136;
+  --chalk:#eceae5; --chalk-dim:#9b9892; --mark:#d8c07a;
+  --s1:8px; --s2:16px; --s3:28px; --s4:48px; --s5:76px;
+  --paper:#efe4cd; --ink:#241a10; --ink-soft:#6f5a41; --rule:#d3c0a0;
+  --board:#e0bc80; --lacquer:#6b4a26;
+  --koma-me:#f4e3b8; --koma-you:#e8cf9f;
+  --sh-p1:polygon(50% 0%,88% 13%,100% 100%,0% 100%,12% 13%);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wall);color:var(--chalk);
+  font-family:'Gothic A1',system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s4) var(--s3) var(--s5)}
+.masthead{border-bottom:1px solid var(--wall-line);padding-bottom:var(--s3)}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mark);
+  font-weight:700;margin:0 0 var(--s2)}
+.masthead h1{font-family:'Gowun Batang',serif;font-weight:700;font-size:clamp(28px,4.4vw,48px);
+  line-height:1.2;margin:0 0 var(--s2);text-wrap:balance}
+.masthead p{max-width:66ch;margin:0;color:var(--chalk-dim);font-size:15px}
+.specs{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);margin-top:var(--s3);
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:#6b6864}
+.specs b{color:var(--chalk);font-weight:400}
+section.block{margin-top:var(--s5)}
+.block>h2{font-family:'Gowun Batang',serif;font-size:26px;margin:0 0 var(--s1);font-weight:700}
+.block>.lede{margin:0 0 var(--s3);max-width:68ch;color:var(--chalk-dim);font-size:14.5px}
+.paperplate{background:var(--paper);color:var(--ink);border-radius:2px;padding:var(--s3)}
+.paperplate.dark{background:#241b12;color:#e8dcc4}
+.paperplate.dark .cellx span{color:#a2937b}
+.paperplate.dark .cellx b{color:#f2e8d2}
+.paperplate.dark .notes{color:#a2937b}
+.paperplate.dark .notes b{color:#f2e8d2}
+
+/* ════ 코마: 정통 오각(P1) + 먹색 점 ════ */
+.koma{position:relative;aspect-ratio:1/1.1;width:100%;
+  filter:drop-shadow(0 2px 1px rgba(60,35,10,.4))}
+.face{position:absolute;inset:0;clip-path:var(--sh-p1);
+  background-color:var(--koma-bg,var(--koma-me));
+  background-image:var(--tex,none),var(--grain,none),
+    var(--sheen,linear-gradient(158deg,rgba(255,252,228,.6) 0%,rgba(255,255,255,0) 44%,rgba(140,96,48,.26) 100%));
+  background-size:cover,auto,auto;
+  background-blend-mode:var(--blend,multiply),normal,normal}
+.box{position:absolute;left:15%;width:70%;aspect-ratio:1;top:20%}
+.art{position:absolute;inset:0;transform:scale(var(--k,1));
+  -webkit-mask:var(--src) center/contain no-repeat;mask:var(--src) center/contain no-repeat;
+  background:var(--ink)}
+.m{position:absolute;width:3.6%;aspect-ratio:1;background:var(--ink);
+  border-radius:50%;transform:translate(-50%,-50%)}
+.n{left:50%;top:0} .ne{left:100%;top:0} .e{left:100%;top:50%} .se{left:100%;top:100%}
+.s{left:50%;top:100%} .sw{left:0;top:100%} .w{left:0;top:50%} .nw{left:0;top:0}
+.koma.flip{transform:rotate(180deg)}
+
+/* ════ 나뭇결 ════ */
+.w-flat{--sheen:none;--grain:none;--tex:none}
+.w-grad{--grain:none;--tex:none}
+.w-css1{--tex:none;--grain:repeating-linear-gradient(97deg,rgba(150,105,55,.10) 0 2px,rgba(0,0,0,0) 2px 9px)}
+.w-css2{--tex:none;--grain:repeating-linear-gradient(93deg,rgba(150,105,55,.17) 0 3px,rgba(0,0,0,0) 3px 15px)}
+.w-maple   {--tex:url(ASSET:wood/maple.jpg)}
+.w-ash     {--tex:url(ASSET:wood/ash.jpg)}
+.w-okoume  {--tex:url(ASSET:wood/okoume.jpg)}
+.w-whiteoak{--tex:url(ASSET:wood/whiteoak.jpg)}
+.w-cherry  {--tex:url(ASSET:wood/cherry.jpg)}
+.w-oak     {--tex:url(ASSET:wood/oak.jpg)}
+.w-fine    {--tex:url(ASSET:wood/fine.jpg);--blend:normal}
+.w-maple90   {--tex:url(ASSET:wood/maple-90.jpg)}
+.w-okoume90  {--tex:url(ASSET:wood/okoume-90.jpg)}
+.w-ash90     {--tex:url(ASSET:wood/ash-90.jpg)}
+.w-whiteoak90{--tex:url(ASSET:wood/whiteoak-90.jpg)}
+.w-cherry90  {--tex:url(ASSET:wood/cherry-90.jpg)}
+.w-oak90     {--tex:url(ASSET:wood/oak-90.jpg)}
+.w-fine .art{background:#f0e2c4}
+.w-you{--koma-bg:var(--koma-you)}
+.kb-light{--koma-bg:#f6e7bd}
+.kb-mid  {--koma-bg:#e2c48c}
+.kb-dark {--koma-bg:#cda86e}
+.w-fine{--koma-bg:#3a2a1a}
+
+/* ════ 기물 ════ */
+.a-lion    {--src:url(ASSET:pieces/lion.png)}
+.a-tiger   {--src:url(ASSET:pieces/tiger.png)}
+.a-giraffe {--src:url(ASSET:pieces/giraffe-a.png);--k:.9}
+.a-giraffe2{--src:url(ASSET:pieces/giraffe-b.png);--k:.9}
+.a-elephant{--src:url(ASSET:pieces/elephant.png)}
+.a-chick   {--src:url(ASSET:pieces/chick-b.png);--k:.66}
+.a-chick2  {--src:url(ASSET:pieces/chick-a.png);--k:.66}
+.a-rooster {--src:url(ASSET:pieces/rooster.png);--k:.95}
+.x-lion    {--src:url(ASSET:pieces-x/lion.png)}
+.x-tiger   {--src:url(ASSET:pieces-x/tiger.png)}
+.x-giraffe {--src:url(ASSET:pieces-x/giraffe-a.png);--k:.9}
+.x-giraffe2{--src:url(ASSET:pieces-x/giraffe-b.png);--k:.9}
+.x-elephant{--src:url(ASSET:pieces-x/elephant.png)}
+.x-chick   {--src:url(ASSET:pieces-x/chick-b.png);--k:.66}
+.x-chick2  {--src:url(ASSET:pieces-x/chick-a.png);--k:.66}
+.x-rooster {--src:url(ASSET:pieces-x/rooster.png);--k:.95}
+
+/* ════ 격자 ════ */
+.rack{display:grid;gap:var(--s3) var(--s2);grid-template-columns:repeat(4,1fr)}
+.rack.six{grid-template-columns:repeat(6,1fr)}
+.rack.eight{grid-template-columns:repeat(8,1fr)}
+@media (max-width:900px){.rack,.rack.six,.rack.eight{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:560px){.rack,.rack.six,.rack.eight{grid-template-columns:repeat(2,1fr)}}
+.cellx{text-align:center}
+.cellx .komabox{width:min(112px,100%);margin:0 auto}
+.cellx b{display:block;font-size:13px;margin-top:9px;font-weight:700}
+.cellx span{display:block;font-size:10.5px;color:var(--ink-soft);
+  font-family:'JetBrains Mono',monospace;line-height:1.5}
+.cellx em{display:block;font-size:10px;color:#b8402a;font-weight:700;font-style:normal;
+  letter-spacing:.06em;margin-top:3px}
+.paperplate.dark .cellx em{color:#e0a94a}
+
+/* ════ 보드 ════ */
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:var(--s3)}
+.bwrap h3{margin:0 0 4px;font-size:15px;font-weight:700}
+.bwrap p{margin:0 0 var(--s2);font-size:12.5px;color:var(--ink-soft);min-height:3em}
+.miniboard{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--lacquer);
+  padding:2px;box-shadow:0 5px 0 #a87c46}
+.miniboard .sqr{background:var(--board);display:grid;place-items:center;padding:6%;aspect-ratio:1}
+.bd-oak .sqr{background-color:#d9ae6e;background-image:url(ASSET:wood/oak.jpg);
+  background-size:180% auto;background-blend-mode:multiply}
+.bd-fine .sqr{background-color:#8a6034;background-image:url(ASSET:wood/fine.jpg);
+  background-size:180% auto;background-blend-mode:normal}
+.bd-light .sqr{background-color:#f2dfb2;background-image:url(ASSET:wood/oak.jpg);
+  background-size:180% auto;background-blend-mode:multiply}
+.bd-dark .sqr{background-color:#c1904a;background-image:url(ASSET:wood/oak.jpg);
+  background-size:180% auto;background-blend-mode:multiply}
+.vscale{display:flex;gap:0;margin:0 0 var(--s2);border:1px solid var(--rule)}
+.vscale div{flex:1;height:52px;display:grid;place-items:end center;padding-bottom:5px;
+  font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink)}
+
+.notes{margin:var(--s3) 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--ink-soft)}
+.notes li{padding-left:15px;position:relative;margin-bottom:7px;max-width:72ch}
+.notes li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;
+  background:#b8402a;border-radius:1px}
+.notes b{color:var(--ink);font-weight:700}
+.qs{margin:var(--s3) 0 0;padding:0;list-style:none;display:grid;gap:var(--s2);
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.qs li{background:var(--wall-2);border-left:2px solid var(--mark);padding:var(--s2) var(--s2) var(--s2) 18px;
+  font-size:13.5px;color:var(--chalk-dim)}
+.qs b{display:block;color:var(--chalk);font-weight:700;margin-bottom:2px}
+.credit{margin-top:var(--s4);font-size:12px;color:#6b6864;font-family:'JetBrains Mono',monospace;
+  border-top:1px solid var(--wall-line);padding-top:var(--s2);line-height:1.8}
+.credit a{color:var(--chalk-dim)}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Direction A · Grain &amp; Full Set</p>
+  <h1>나뭇결 고르기</h1>
+  <p>프레임은 <b>P1 정통 오각</b>, 표시는 <b>먹색 점 3.6%</b>로 확정했습니다. 남은 건 코마의 재질입니다. 결이 아예 없는 안부터 CSS로 그은 결, Poly Haven에서 받은 CC0 실사 목재 여섯 종까지 같은 조건으로 올렸습니다. 아래에 두 세트의 여덟 장을 모두 실었습니다.</p>
+  <div class="specs">
+    <span>프레임 <b>P1 정통 오각</b></span>
+    <span>표시 <b>먹색 점 3.6%</b></span>
+    <span>결 <b>무결 2 · CSS 2 · 실사 7 × 2방향</b></span>
+    <span>텍스처 <b>Poly Haven CC0</b></span>
+  </div>
+</header>
+
+<section class="block">
+  <h2>1. 결이 없는 쪽부터</h2>
+  <p class="lede">왼쪽 둘은 이미지를 전혀 쓰지 않습니다. 파일 용량이 0이고 어느 해상도에서도 깨지지 않습니다.</p>
+  <div class="paperplate">
+    <div class="rack four">
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-flat]]</div><b>무결 · 단색</b><span>#F4E3B8<br>그라디언트도 없음</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-grad]]</div><b>무결 · 광택만</b><span>대각 그라디언트<br>빛 반사만 암시</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-css1]]</div><b>CSS 잔결</b><span>2px / 9px 간격<br>지금까지 쓰던 것</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-css2]]</div><b>CSS 굵은결</b><span>3px / 15px<br>대비 강함</span></div>
+    </div>
+    <ul class="notes">
+      <li><b>무결·단색은 생각보다 버팁니다.</b> 그림이 이미 손그림 선이라 코마까지 질감을 넣으면 정보가 겹칩니다. 나무를 포기하는 게 아니라 판과 판틀이 나무를 맡고 코마는 비워두는 방식입니다.</li>
+      <li><b>CSS 결은 확대하면 정직한 줄무늬로 보입니다.</b> 태블릿 해상도에서 코마가 커지면 나무보다 스트라이프 패턴으로 읽힐 위험이 있습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>2. 실사 목재 일곱 종</h2>
+  <p class="lede">Poly Haven의 CC0 목재 텍스처입니다. 코마 색 위에 곱하기로 얹어 팔레트를 벗어나지 않게 했습니다. 마지막 호두나무만 원색 그대로 씁니다.</p>
+  <div class="paperplate">
+    <div class="rack six">
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-maple]]</div><b>흰단풍</b><span>white maple<br>가장 밝고 잔결</span><em>회양목에 근접</em></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-okoume]]</div><b>오쿠메</b><span>okoume<br>붉은기 · 결 옅음</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-ash]]</div><b>물푸레</b><span>ash<br>회색기 · 직선결</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-whiteoak]]</div><b>백참나무</b><span>white oak<br>세로결 뚜렷</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-cherry]]</div><b>벚나무</b><span>cherry<br>따뜻함 · 결 거의 없음</span><em>상대 진영용</em></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-oak]]</div><b>참나무</b><span>oak<br>물결결 · 가장 강함</span></div>
+    </div>
+    <h3 style="margin:32px 0 4px;font-size:15px">같은 목재, 결을 90° 돌린 것</h3>
+    <p style="margin:0 0 20px;font-size:13px;color:var(--ink-soft)">위가 세로결(원본), 아래가 가로결입니다. 실물 쇼기 코마는 나무를 세로로 켜서 만들기 때문에 결이 코마 길이 방향, 즉 세로로 흐릅니다 — 가로결은 실제로는 나오지 않는 재단이지만, 화면에서는 인상이 꽤 달라집니다.</p>
+    <div class="rack six">
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-maple90]]</div><b>흰단풍 가로</b><span>white maple 90°</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-okoume90]]</div><b>오쿠메 가로</b><span>okoume 90°</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-ash90]]</div><b>물푸레 가로</b><span>ash 90°</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-whiteoak90]]</div><b>백참나무 가로</b><span>white oak 90°</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-cherry90]]</div><b>벚나무 가로</b><span>cherry 90°</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-oak90]]</div><b>참나무 가로</b><span>oak 90°</span></div>
+    </div>
+    <ul class="notes">
+      <li><b>가로결은 코마를 넓어 보이게 합니다.</b> 세로결이 오각형의 뾰족한 위쪽을 따라 흘러 방향감을 거드는 반면, 가로결은 그 흐름을 끊어 코마가 납작해 보입니다. 백참나무·참나무처럼 결이 센 수종에서 차이가 가장 큽니다.</li>
+      <li><b>흰단풍이 실물 코마에 가장 가깝습니다.</b> 진짜 쇼기 코마는 회양목(黄楊)인데, 밝은 노란빛에 결이 아주 곱습니다. 흰단풍이 그 질감입니다.</li>
+      <li><b>참나무는 결이 너무 셉니다.</b> 코마에는 그림과 싸우지만, 반대로 <b>판(반)에 깔면</b> 좋습니다. 5번에서 그렇게 써봤습니다.</li>
+      <li><b>벚나무는 결이 거의 없이 따뜻하기만 해서</b> 상대 진영 코마로 쓰면 색만 갈리고 질감은 같습니다 — 진영 구분용으로 딱 맞습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>3. 기본 세트 여덟 장</h2>
+  <p class="lede">흰단풍 결에 올린 전체 기물입니다. 여분(기린 B, 병아리 A)까지 같이 실었습니다. 병아리는 66%, 기린은 90%, 닭은 95% 크기입니다.</p>
+  <div class="paperplate">
+    <div class="rack eight">
+      <div class="cellx"><div class="komabox">[[koma|a-lion|w-maple]]</div><b>사자</b><span>8방향</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-tiger|w-maple w-you]]</div><b>호랑이</b><span>8방향</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-giraffe|w-maple]]</div><b>기린 A</b><span>상하좌우</span><em>확정</em></div>
+      <div class="cellx"><div class="komabox">[[koma|a-giraffe2|w-maple]]</div><b>기린 B</b><span>상하좌우</span><span>여분</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-elephant|w-maple]]</div><b>코끼리</b><span>대각 4</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-chick|w-maple]]</div><b>병아리</b><span>앞 1칸</span><em>확정 · 작은쪽</em></div>
+      <div class="cellx"><div class="komabox">[[koma|a-chick2|w-maple]]</div><b>병아리 여분</b><span>앞 1칸</span><span>큰쪽</span></div>
+      <div class="cellx"><div class="komabox">[[koma|a-rooster|w-maple]]</div><b>닭</b><span>6방향</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>4. 이스터에그 세트 여덟 장</h2>
+  <p class="lede">펜화 세트도 같은 프레임·같은 점 좌표입니다. 해칭이 촘촘해 코마가 어두워지므로 결은 벚나무처럼 옅은 쪽이 낫습니다. 오른쪽 끝 두 장은 호두나무에 밝은 먹으로 뒤집어본 것입니다.</p>
+  <div class="paperplate dark">
+    <div class="rack eight">
+      <div class="cellx"><div class="komabox">[[koma|x-lion|w-cherry]]</div><b>사자</b><span>8방향</span></div>
+      <div class="cellx"><div class="komabox">[[koma|x-tiger|w-cherry]]</div><b>호랑이</b><span>8방향</span></div>
+      <div class="cellx"><div class="komabox">[[koma|x-giraffe|w-cherry]]</div><b>기린 A</b><span>옆모습</span><em>확정</em></div>
+      <div class="cellx"><div class="komabox">[[koma|x-giraffe2|w-cherry]]</div><b>기린 B</b><span>정면</span><span>여분</span></div>
+      <div class="cellx"><div class="komabox">[[koma|x-elephant|w-cherry]]</div><b>코끼리</b><span>대각 4</span></div>
+      <div class="cellx"><div class="komabox">[[koma|x-chick|w-cherry]]</div><b>병아리 정면</b><span>앞 1칸</span><span>여분</span></div>
+      <div class="cellx"><div class="komabox">[[koma|x-chick2|w-cherry]]</div><b>병아리 옆</b><span>앞 1칸 · 66%</span><em>확정</em></div>
+      <div class="cellx"><div class="komabox">[[koma|x-rooster|w-cherry]]</div><b>닭</b><span>6방향</span></div>
+    </div>
+    <ul class="notes">
+      <li><b>크기는 기본 세트와 같은 66%로 갑니다.</b> 해칭이 촘촘해 작은 칸에서 덩어리로 뭉칠 수 있으니, 실기기에서 한 번 확인해 주세요. 뭉치면 그때 이 세트만 올리면 됩니다.</li>
+      <li><b>기린 A·병아리 옆으로 확정했습니다.</b> 옆모습끼리라 둘이 한 계열로 묶이고, 사자·호랑이·닭의 정면 구도와 대비가 생겨 오히려 왕과 졸이 갈립니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>5. 판 위에서</h2>
+  <p class="lede">초기 배치 두 줄. 판은 참나무, 코마 결만 바꿔가며 그렸습니다.</p>
+  <div class="paperplate">
+    <div class="boards">
+      <div class="bwrap">
+        <h3>무결 코마 · 참나무 판</h3>
+        <p>나무는 판이 맡고 코마는 비웁니다. 그림이 가장 선명하게 읽힙니다.</p>
+        <div class="miniboard bd-oak">
+          <div class="sqr">[[koma|a-giraffe|w-grad flip]]</div>
+          <div class="sqr">[[koma|a-tiger|w-grad flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-grad flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-grad]]</div>
+          <div class="sqr">[[koma|a-lion|w-grad]]</div>
+          <div class="sqr">[[koma|a-giraffe|w-grad]]</div>
+        </div>
+      </div>
+      <div class="bwrap">
+        <h3>흰단풍 코마 · 참나무 판</h3>
+        <p>결의 굵기가 판과 코마에서 다르게 나서 두 재료로 읽힙니다.</p>
+        <div class="miniboard bd-oak">
+          <div class="sqr">[[koma|a-giraffe|w-maple flip]]</div>
+          <div class="sqr">[[koma|a-tiger|w-maple flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple]]</div>
+          <div class="sqr">[[koma|a-lion|w-maple]]</div>
+          <div class="sqr">[[koma|a-giraffe|w-maple]]</div>
+        </div>
+      </div>
+      <div class="bwrap">
+        <h3>이스터에그 · 호두나무 판</h3>
+        <p>펜화 세트에 판까지 어둡게. 같은 배치인데 완전히 다른 게임으로 보입니다.</p>
+        <div class="miniboard bd-fine">
+          <div class="sqr">[[koma|x-giraffe2|w-cherry flip]]</div>
+          <div class="sqr">[[koma|x-tiger|w-cherry flip]]</div>
+          <div class="sqr">[[koma|x-elephant|w-cherry flip]]</div>
+          <div class="sqr">[[koma|x-elephant|w-cherry]]</div>
+          <div class="sqr">[[koma|x-lion|w-cherry]]</div>
+          <div class="sqr">[[koma|x-giraffe2|w-cherry]]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <h2>6. 판과 코마, 뭐가 더 밝아야 하나</h2>
+  <p class="lede">실물 쇼기는 판이 <b>비자나무(榧)</b>, 말이 <b>회양목(黄楊)</b>입니다. 둘 다 새것일 때는 밝은 노란색이라 명도가 거의 같습니다. 대비는 나무끼리가 아니라 <b>옻칠로 쓴 검은 글씨</b>가 만듭니다. 다만 말은 손을 타면서 호박색으로 짙어지기 때문에, 오래 쓴 세트는 <b>판이 말보다 밝습니다.</b></p>
+  <div class="paperplate">
+    <div class="vscale">
+      <div style="background:#f6e7bd">코마 · 가장 밝게</div>
+      <div style="background:#d9ae6e">판 · 한 단계 어둡게</div>
+      <div style="background:#6b4a26;color:#e8d4ab">판틀 · 가장 어둡게</div>
+      <div style="background:#241a10;color:#e8d4ab">먹 · 그림과 점</div>
+    </div>
+    <p style="margin:0 0 24px;font-size:13.5px;color:var(--ink-soft);max-width:72ch">우리 쪽은 사정이 다릅니다. 실물 쇼기는 말 위에 <b>글자 몇 획</b>만 얹지만, 우리는 <b>동물 그림 한 장</b>을 통째로 얹습니다. 그림이 정보의 대부분이니 그림이 앉을 바닥이 가장 밝아야 합니다. 그래서 코마 → 판 → 판틀 순으로 어두워지는 3단 구조를 권합니다.</p>
+
+    <div class="boards">
+      <div class="bwrap">
+        <h3>가 · 판이 밝고 코마가 어둡다</h3>
+        <p>오래 쓴 실물 쇼기에 가장 가깝습니다. 코마 실루엣은 또렷한데, 그림의 먹이 어두운 바닥에 깔려 힘을 잃습니다.</p>
+        <div class="miniboard bd-light">
+          <div class="sqr">[[koma|a-giraffe|w-maple kb-dark flip]]</div>
+          <div class="sqr">[[koma|a-tiger|w-maple kb-dark flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple kb-dark flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple kb-dark]]</div>
+          <div class="sqr">[[koma|a-lion|w-maple kb-dark]]</div>
+          <div class="sqr">[[koma|a-giraffe|w-maple kb-dark]]</div>
+        </div>
+      </div>
+      <div class="bwrap">
+        <h3>나 · 둘의 명도가 비슷하다</h3>
+        <p>새 쇼기 세트의 상태입니다. 우아하지만 코마의 경계가 흐려져서, 어디까지가 말이고 어디부터가 판인지 순간적으로 헷갈립니다.</p>
+        <div class="miniboard bd-light">
+          <div class="sqr">[[koma|a-giraffe|w-maple kb-mid flip]]</div>
+          <div class="sqr">[[koma|a-tiger|w-maple kb-mid flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple kb-mid flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple kb-mid]]</div>
+          <div class="sqr">[[koma|a-lion|w-maple kb-mid]]</div>
+          <div class="sqr">[[koma|a-giraffe|w-maple kb-mid]]</div>
+        </div>
+      </div>
+      <div class="bwrap">
+        <h3>다 · 코마가 밝고 판이 어둡다</h3>
+        <p>그림의 먹이 가장 밝은 바닥에 앉고, 코마가 판에서 떠오릅니다. 실물 쇼기와는 반대지만 화면에서는 이쪽이 읽힙니다.</p>
+        <div class="miniboard bd-dark">
+          <div class="sqr">[[koma|a-giraffe|w-maple kb-light flip]]</div>
+          <div class="sqr">[[koma|a-tiger|w-maple kb-light flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple kb-light flip]]</div>
+          <div class="sqr">[[koma|a-elephant|w-maple kb-light]]</div>
+          <div class="sqr">[[koma|a-lion|w-maple kb-light]]</div>
+          <div class="sqr">[[koma|a-giraffe|w-maple kb-light]]</div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li><b>추천은 '다'입니다.</b> 코마가 가장 밝고, 판이 한 단계 어둡고, 판틀이 가장 어둡습니다. 명도가 세 단계로 벌어지면 코마 그림자 없이도 말이 떠 보입니다.</li>
+      <li><b>'가'는 전통에 가장 충실합니다.</b> 원작 감각을 최우선으로 두신다면 이쪽입니다. 대신 그림을 먹색보다 밝은 색(짙은 갈색쯤)으로 올려 코마 안에서의 대비를 따로 확보해야 합니다.</li>
+      <li><b>'나'는 피하는 게 좋습니다.</b> 실물에서는 그림자와 두께가 경계를 만들어주지만 화면에는 그게 없습니다. 태블릿에서 가장 먼저 무너지는 조합입니다.</li>
+      <li><b>실물 동물쇼기도 '다' 쪽입니다.</b> 판이 옅은 회색·보라 격자의 매트이고 말이 크림색 목재라, 말이 판보다 밝습니다. 어린이용으로 설계하면서 전통 배색을 버린 겁니다.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <h2>정할 것</h2>
+  <ul class="qs">
+    <li><b>코마 결</b>제 추천은 <b>흰단풍</b>입니다. 실물 회양목에 가장 가깝고 결이 고와 그림과 싸우지 않습니다. 용량이 걸리면 무결·광택만도 충분히 버팁니다.</li>
+    <li><b>판 결</b>참나무를 깔아봤습니다. 코마와 결 굵기가 달라 두 재료로 읽힙니다 — 이대로 갈지, 판도 무결로 갈지.</li>
+    <li><b>진영 구분</b>벚나무가 결 없이 따뜻하기만 해서 상대 코마로 쓰기 좋습니다. 흰단풍 vs 벚나무 조합을 시험해볼까요.</li>
+    <li><b>판·코마 명도</b>6번의 가 / 나 / 다 중 하나. 추천은 '다'(코마가 가장 밝음)입니다.</li>
+  </ul>
+</section>
+
+<p class="credit">
+목재 텍스처 · Poly Haven, CC0 — <a href="https://polyhaven.com/textures/wood">polyhaven.com/textures/wood</a><br>
+사용된 에셋 · white_maple_veneer, okoume_veneer, ash_veneer, white_oak_veneer, cherry_veneer, oak_veneer_01, fine_grained_wood<br>
+동물 · 사용자 제공 이미지 2세트 × 8종, 알파 추출 후 CSS 마스크로 먹색 치환
+</p>
+
+</div>

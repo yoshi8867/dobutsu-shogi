@@ -1,0 +1,560 @@
+<title>동물쇼기 아트 디렉션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@300;400;500;700;900&family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* ── 페이지 크롬: 디자인 갤러리 벽. 시안 팔레트가 흔들리면 안 되므로 단일 테마로 고정 ── */
+:root{
+  --wall:#17181a; --wall-2:#1f2124; --wall-line:#2e3136;
+  --chalk:#eceae5; --chalk-dim:#9b9892; --chalk-faint:#6b6864;
+  --mark:#d8c07a;
+  --s1:8px; --s2:16px; --s3:28px; --s4:48px; --s5:80px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wall);color:var(--chalk);
+  font-family:'Gothic A1',system-ui,sans-serif;font-weight:400;line-height:1.7;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s4) var(--s3) var(--s5)}
+
+/* 헤더 */
+.masthead{border-bottom:1px solid var(--wall-line);padding-bottom:var(--s3);margin-bottom:var(--s4)}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mark);
+  font-weight:700;margin:0 0 var(--s2)}
+.masthead h1{font-family:'Gowun Batang',serif;font-weight:700;font-size:clamp(30px,4.6vw,52px);
+  line-height:1.2;margin:0 0 var(--s2);text-wrap:balance;letter-spacing:-.01em}
+.masthead p{max-width:62ch;margin:0;color:var(--chalk-dim);font-size:15px}
+.specs{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s3);margin-top:var(--s3);
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--chalk-faint)}
+.specs b{color:var(--chalk);font-weight:400}
+
+/* 시안 판 */
+.plate{margin-top:var(--s5);border-radius:2px;overflow:hidden;background:var(--plate-bg);color:var(--plate-fg)}
+.plate-head{display:flex;align-items:baseline;gap:var(--s2);flex-wrap:wrap;
+  padding:var(--s3) var(--s3) 0}
+.tag{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+  border:1.5px solid currentColor;border-radius:999px;width:30px;height:30px;
+  display:grid;place-items:center;flex:none;color:var(--accent)}
+.plate-head h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em;font-family:var(--font-disp)}
+.plate-head .jp{font-size:13px;color:var(--plate-mute);font-family:'JetBrains Mono',monospace;letter-spacing:.08em}
+.thesis{margin:var(--s2) var(--s3) 0;max-width:64ch;font-size:15px;color:var(--plate-mute)}
+
+.plate-body{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(220px,.85fr);
+  gap:var(--s3);padding:var(--s3);align-items:start}
+@media (max-width:860px){.plate-body{grid-template-columns:1fr}}
+
+/* 태블릿 목업 */
+.tablet{background:#0b0b0c;border-radius:20px;padding:11px;box-shadow:0 18px 40px rgba(0,0,0,.28)}
+.screen{aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:var(--screen);
+  display:grid;grid-template-columns:1fr auto 1fr;gap:2%;padding:2.4%;align-items:stretch}
+
+/* 손패(코마다이) */
+.tray{display:flex;flex-direction:column;gap:6px;min-width:0}
+.tray.mine{justify-content:flex-end;align-items:flex-end;text-align:right}
+.tray.theirs{justify-content:flex-start}
+.tray-label{font-size:10px;letter-spacing:.14em;color:var(--label);font-weight:700;
+  text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.tray-name{font-size:13px;font-weight:700;color:var(--plate-fg);line-height:1.2}
+.held{display:flex;gap:6px;flex-wrap:wrap}
+.tray.mine .held{justify-content:flex-end}
+.held .piece{width:min(52px,4.6vw)}
+.turn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:999px;background:var(--chip-bg);color:var(--chip-fg);
+  font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+.turn::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* 보드 */
+.board-area{display:flex;align-items:center;justify-content:center;min-width:0}
+.board{display:grid;grid-template-columns:repeat(3,1fr);aspect-ratio:3/4;height:100%;
+  gap:var(--grid-gap);background:var(--grid-line);padding:var(--grid-gap);
+  border-radius:var(--board-r);box-shadow:var(--board-shadow)}
+.cell{background:var(--cell);display:grid;place-items:center;position:relative;
+  border-radius:var(--cell-r)}
+.cell.alt{background:var(--cell-alt,var(--cell))}
+.cell.sel{background:var(--sel)}
+.cell.trail{background:var(--trail)}
+.cell.move::after{content:"";width:26%;aspect-ratio:1;border-radius:50%;background:var(--movedot);
+  position:absolute;box-shadow:var(--movedot-glow,none)}
+.piece{width:86%;display:block}
+.piece svg{display:block;width:100%;height:auto}
+.flip{transform:rotate(180deg)}
+
+/* 기물 색 스코프 */
+.me{--tok:var(--tok-me);--art:var(--art-me)}
+.you{--tok:var(--tok-you);--art:var(--art-you)}
+
+/* 사양 패널 */
+.spec h3{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--plate-mute);
+  margin:0 0 var(--s1);font-weight:700;font-family:'JetBrains Mono',monospace}
+.spec section+section{margin-top:var(--s3)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px}
+.sw{width:100%;max-width:74px;flex:1 1 60px}
+.sw i{display:block;height:34px;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.sw span{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--plate-mute);
+  margin-top:4px;letter-spacing:.01em}
+.typ{margin:0;font-size:15px;line-height:1.5}
+.typ b{display:block;font-size:20px;font-weight:700;font-family:var(--font-disp)}
+.typ small{color:var(--plate-mute);font-size:12px;font-family:'JetBrains Mono',monospace}
+.notes{margin:0;padding:0;list-style:none;font-size:13.5px;color:var(--plate-mute)}
+.notes li{padding-left:14px;position:relative;margin-bottom:6px}
+.notes li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;
+  background:var(--accent);border-radius:1px}
+.notes b{color:var(--plate-fg);font-weight:700}
+
+/* 기물 세트 스트립 */
+.strip{border-top:1px solid var(--plate-rule);padding:var(--s3);
+  display:grid;grid-template-columns:repeat(5,1fr);gap:var(--s2)}
+.chip{text-align:center}
+.chip .piece{width:min(96px,100%);margin:0 auto}
+.chip b{display:block;font-size:13px;font-weight:700;margin-top:10px}
+.chip span{display:block;font-size:11px;color:var(--plate-mute);font-family:'JetBrains Mono',monospace}
+.strip-foot{grid-column:1/-1;font-size:12.5px;color:var(--plate-mute);
+  border-top:1px dashed var(--plate-rule);padding-top:var(--s2);margin-top:4px}
+.strip-foot b{color:var(--plate-fg)}
+
+/* ── A: 桐と墨 ── */
+.v-a{--plate-bg:#efe4cd;--plate-fg:#2a1d12;--plate-mute:#6f5a41;--plate-rule:#d3c0a0;
+  --accent:#b8402a;--font-disp:'Gowun Batang',serif;
+  --screen:#e7d6b2;--label:#8a6f4e;--chip-bg:#2a1d12;--chip-fg:#f0e0bb;
+  --grid-line:#6b4a26;--grid-gap:2px;--cell:#e0bc80;--cell-alt:#e0bc80;--board-r:3px;
+  --cell-r:0;--board-shadow:0 6px 0 #a87c46,0 10px 18px rgba(60,35,10,.35);
+  --sel:#d6a95f;--trail:#dbb374;--movedot:rgba(184,64,42,.55);--pip:#b8402a}
+.v-a .piece{filter:drop-shadow(0 1px 1px rgba(60,35,10,.35))}
+
+/* ── B: 円と積み木 ── */
+.v-b{--plate-bg:#ebeae4;--plate-fg:#15171b;--plate-mute:#5f6269;--plate-rule:#d3d2ca;
+  --accent:#1b4db1;--font-disp:'Gothic A1',sans-serif;
+  --screen:#f7f6f2;--label:#8d9098;--chip-bg:#1b4db1;--chip-fg:#fff;
+  --grid-line:#dedcd3;--grid-gap:4px;--cell:#fff;--board-r:6px;--cell-r:3px;
+  --board-shadow:none;--sel:#fbeeb8;--trail:#f4f2e4;--movedot:#f2c230;
+  --pip:#f2c230;--tok-me:#1b4db1;--art-me:#f7f6f2;--tok-you:#d64f2a;--art-you:#f7f6f2}
+
+/* ── C: 夜と光 ── */
+.v-c{--plate-bg:#0e141b;--plate-fg:#dfe9f2;--plate-mute:#7c8da0;--plate-rule:#1e2a36;
+  --accent:#57e6c3;--font-disp:'Gothic A1',sans-serif;
+  --screen:#0b1016;--label:#4d6070;--chip-bg:#57e6c3;--chip-fg:#06231d;
+  --grid-line:#1b2836;--grid-gap:2px;--cell:#111823;--board-r:10px;--cell-r:4px;
+  --board-shadow:0 0 0 1px #1e3040,0 0 40px rgba(87,230,195,.10);
+  --sel:#122c2c;--trail:#141d28;--movedot:#57e6c3;--movedot-glow:0 0 10px rgba(87,230,195,.85);
+  --pip:#57e6c3;--tok-me:#57e6c3;--tok-you:#ff7a6b}
+.v-c .me{--pip:#57e6c3}
+.v-c .you{--pip:#ff7a6b}
+.v-c .me .piece{filter:drop-shadow(0 0 5px rgba(87,230,195,.45))}
+.v-c .you .piece{filter:drop-shadow(0 0 5px rgba(255,122,107,.4))}
+.v-c .sw i{box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+
+/* 마무리 */
+.close{margin-top:var(--s5);border-top:1px solid var(--wall-line);padding-top:var(--s3)}
+.close h2{font-family:'Gowun Batang',serif;font-size:24px;margin:0 0 var(--s2)}
+.qs{margin:0;padding:0;list-style:none;display:grid;gap:var(--s2);
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.qs li{background:var(--wall-2);border-left:2px solid var(--mark);padding:var(--s2) var(--s2) var(--s2) 18px;
+  font-size:14px;color:var(--chalk-dim)}
+.qs b{display:block;color:var(--chalk);font-weight:700;margin-bottom:2px}
+@media (prefers-reduced-motion:no-preference){
+  .cell.move::after{animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.75;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+
+<!-- ══ A세트: 붓과 나무. 채움 중심, 둥근 형태, 오각형 코마 위에 얹힌다 ══ -->
+<symbol id="a-lion" viewBox="0 0 100 100">
+  <g fill="#c8763a"><circle cx="72" cy="50" r="8.5"/><circle cx="65.6" cy="34.4" r="8.5"/><circle cx="50" cy="28" r="8.5"/><circle cx="34.4" cy="34.4" r="8.5"/><circle cx="28" cy="50" r="8.5"/><circle cx="34.4" cy="65.6" r="8.5"/><circle cx="50" cy="72" r="8.5"/><circle cx="65.6" cy="65.6" r="8.5"/><circle cx="50" cy="50" r="24"/></g>
+  <circle cx="50" cy="50" r="18" fill="#f8ecd2"/>
+  <circle cx="43" cy="46" r="2.8" fill="#2a1d12"/><circle cx="57" cy="46" r="2.8" fill="#2a1d12"/>
+  <path d="M50 52.5 l4.6 4.2 h-9.2z" fill="#2a1d12"/>
+  <path d="M50 57 q-4.5 5 -8.5 1 M50 57 q4.5 5 8.5 1" stroke="#2a1d12" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <g fill="var(--pip)"><circle cx="50" cy="17" r="4"/><circle cx="78" cy="24" r="4"/><circle cx="89" cy="52" r="4"/><circle cx="87" cy="87" r="4"/><circle cx="50" cy="91" r="4"/><circle cx="13" cy="87" r="4"/><circle cx="11" cy="52" r="4"/><circle cx="22" cy="24" r="4"/></g>
+</symbol>
+<symbol id="a-giraffe" viewBox="0 0 100 100">
+  <path d="M43 31 v-9 M57 31 v-9" stroke="#8a5a2b" stroke-width="3.4" stroke-linecap="round"/>
+  <circle cx="43" cy="21" r="3.4" fill="#8a5a2b"/><circle cx="57" cy="21" r="3.4" fill="#8a5a2b"/>
+  <g fill="#e6ab4b"><path d="M42 84 h16 v-38 h-16z"/><ellipse cx="50" cy="40" rx="15.5" ry="12.5"/><ellipse cx="33" cy="37" rx="6.5" ry="4" transform="rotate(-20 33 37)"/><ellipse cx="67" cy="37" rx="6.5" ry="4" transform="rotate(20 67 37)"/></g>
+  <g fill="#b8762a"><circle cx="46" cy="55" r="3.4"/><circle cx="55" cy="64" r="3.4"/><circle cx="45" cy="73" r="3.4"/><circle cx="56" cy="80" r="3"/></g>
+  <circle cx="44" cy="38" r="2.4" fill="#2a1d12"/><circle cx="56" cy="38" r="2.4" fill="#2a1d12"/>
+  <circle cx="47" cy="46" r="1.5" fill="#b8762a"/><circle cx="53" cy="46" r="1.5" fill="#b8762a"/>
+  <g fill="var(--pip)"><circle cx="50" cy="17" r="4"/><circle cx="89" cy="52" r="4"/><circle cx="50" cy="91" r="4"/><circle cx="11" cy="52" r="4"/></g>
+</symbol>
+<symbol id="a-elephant" viewBox="0 0 100 100">
+  <ellipse cx="26" cy="52" rx="11" ry="16" fill="#9b93ab"/><ellipse cx="74" cy="52" rx="11" ry="16" fill="#9b93ab"/>
+  <ellipse cx="50" cy="50" rx="21" ry="19.5" fill="#b9b2c7"/>
+  <path d="M41 64 q-2.5 8 0.5 11 M59 64 q2.5 8 -0.5 11" stroke="#f8ecd2" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+  <path d="M50 62 q-3.5 10 2.5 14.5 q4.5 3.4 8 -1.5" stroke="#b9b2c7" stroke-width="9.5" fill="none" stroke-linecap="round"/>
+  <circle cx="41" cy="47" r="2.6" fill="#2a1d12"/><circle cx="59" cy="47" r="2.6" fill="#2a1d12"/>
+  <g fill="var(--pip)"><circle cx="78" cy="24" r="4"/><circle cx="87" cy="87" r="4"/><circle cx="13" cy="87" r="4"/><circle cx="22" cy="24" r="4"/></g>
+</symbol>
+<symbol id="a-chick" viewBox="0 0 100 100">
+  <path d="M50 29 q-2.5 -8 -8 -9.5 M50 28 v-9.5 M50 29 q2.5 -8 8 -9.5" stroke="#e8a33d" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="50" cy="62" rx="17.5" ry="16" fill="#f2c94c"/>
+  <ellipse cx="33.5" cy="62" rx="5" ry="8.5" fill="#e0b13a"/><ellipse cx="66.5" cy="62" rx="5" ry="8.5" fill="#e0b13a"/>
+  <circle cx="50" cy="43" r="14" fill="#fadd7e"/>
+  <circle cx="44.5" cy="41" r="2.6" fill="#2a1d12"/><circle cx="55.5" cy="41" r="2.6" fill="#2a1d12"/>
+  <path d="M44.5 47 h11 l-5.5 6.5z" fill="#e8843d"/>
+  <path d="M44 77 v5.5 M56 77 v5.5" stroke="#e8843d" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="50" cy="17" r="4" fill="var(--pip)"/>
+</symbol>
+<symbol id="a-hen" viewBox="0 0 100 100">
+  <path d="M30 58 q-13 -5 -16 -18 q11 3 18 9z" fill="#c8763a"/>
+  <path d="M41 30 q3 -9 6.5 -.5 q3.5 -9 6.5 -.5 q3.5 -8 5.5 1.5z" fill="#b8402a"/>
+  <ellipse cx="51" cy="63" rx="18" ry="16" fill="#f4e6c4"/>
+  <circle cx="50" cy="43" r="13.5" fill="#fbf2dc"/>
+  <path d="M39 60 q11 -6 19 2.5 q-9 8 -19 -2.5z" fill="#ddc99c"/>
+  <circle cx="44.5" cy="41" r="2.6" fill="#2a1d12"/><circle cx="55.5" cy="41" r="2.6" fill="#2a1d12"/>
+  <path d="M45 46 h10.5 l-5.2 6z" fill="#e8a33d"/>
+  <circle cx="50" cy="56" r="3.4" fill="#b8402a"/>
+  <g fill="var(--pip)"><circle cx="50" cy="17" r="4"/><circle cx="78" cy="24" r="4"/><circle cx="89" cy="52" r="4"/><circle cx="50" cy="91" r="4"/><circle cx="11" cy="52" r="4"/><circle cx="22" cy="24" r="4"/></g>
+</symbol>
+
+<!-- ══ B세트: 원과 적목. 진영색 원반 + 기하 블록 ══ -->
+<symbol id="b-lion" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="41" fill="var(--tok)"/>
+  <rect x="26" y="26" width="48" height="48" rx="3" fill="var(--art)" transform="rotate(45 50 50)"/>
+  <rect x="34" y="36" width="32" height="30" rx="4" fill="var(--tok)"/>
+  <rect x="34" y="28" width="9" height="9" fill="var(--tok)"/><rect x="57" y="28" width="9" height="9" fill="var(--tok)"/>
+  <rect x="40" y="45" width="5" height="7" fill="var(--art)"/><rect x="55" y="45" width="5" height="7" fill="var(--art)"/>
+  <path d="M46 57 h8 l-4 6z" fill="var(--art)"/>
+  <g fill="var(--pip)"><circle cx="50" cy="9" r="4.2"/><circle cx="79" cy="21" r="4.2"/><circle cx="91" cy="50" r="4.2"/><circle cx="79" cy="79" r="4.2"/><circle cx="50" cy="91" r="4.2"/><circle cx="21" cy="79" r="4.2"/><circle cx="9" cy="50" r="4.2"/><circle cx="21" cy="21" r="4.2"/></g>
+</symbol>
+<symbol id="b-giraffe" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="41" fill="var(--tok)"/>
+  <rect x="43" y="46" width="14" height="32" fill="var(--art)"/>
+  <rect x="35" y="28" width="30" height="20" rx="9" fill="var(--art)"/>
+  <rect x="40" y="19" width="4.5" height="10" fill="var(--art)"/><rect x="55.5" y="19" width="4.5" height="10" fill="var(--art)"/>
+  <circle cx="42" cy="19" r="4" fill="var(--art)"/><circle cx="58" cy="19" r="4" fill="var(--art)"/>
+  <rect x="44" y="52" width="6" height="6" fill="var(--tok)"/><rect x="51" y="62" width="6" height="6" fill="var(--tok)"/><rect x="44" y="70" width="6" height="6" fill="var(--tok)"/>
+  <rect x="42" y="34" width="5" height="5" fill="var(--tok)"/><rect x="53" y="34" width="5" height="5" fill="var(--tok)"/>
+  <g fill="var(--pip)"><circle cx="50" cy="9" r="4.2"/><circle cx="91" cy="50" r="4.2"/><circle cx="50" cy="91" r="4.2"/><circle cx="9" cy="50" r="4.2"/></g>
+</symbol>
+<symbol id="b-elephant" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="41" fill="var(--tok)"/>
+  <path d="M30 38 h-9 a11 11 0 0 0 0 22 h9z" fill="var(--art)"/>
+  <path d="M70 38 h9 a11 11 0 0 1 0 22 h-9z" fill="var(--art)"/>
+  <rect x="30" y="27" width="40" height="36" rx="8" fill="var(--art)"/>
+  <path d="M44 60 h12 v12 a6 6 0 0 1 -12 0z" fill="var(--art)"/>
+  <rect x="38" y="38" width="6" height="6" fill="var(--tok)"/><rect x="56" y="38" width="6" height="6" fill="var(--tok)"/>
+  <g fill="var(--pip)"><circle cx="79" cy="21" r="4.2"/><circle cx="79" cy="79" r="4.2"/><circle cx="21" cy="79" r="4.2"/><circle cx="21" cy="21" r="4.2"/></g>
+</symbol>
+<symbol id="b-chick" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="41" fill="var(--tok)"/>
+  <path d="M50 16 l7 12 h-14z" fill="var(--art)"/>
+  <circle cx="50" cy="55" r="24" fill="var(--art)"/>
+  <circle cx="42" cy="48" r="3.4" fill="var(--tok)"/><circle cx="58" cy="48" r="3.4" fill="var(--tok)"/>
+  <path d="M43 56 h14 l-7 9z" fill="var(--tok)"/>
+  <rect x="43" y="76" width="4" height="7" rx="2" fill="var(--art)"/><rect x="53" y="76" width="4" height="7" rx="2" fill="var(--art)"/>
+  <circle cx="50" cy="9" r="4.2" fill="var(--pip)"/>
+</symbol>
+<symbol id="b-hen" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="41" fill="var(--tok)"/>
+  <path d="M38 30 l5 -10 l5 10z M48 28 l5 -11 l5 11z M58 30 l4 -9 l4 9z" fill="var(--art)"/>
+  <circle cx="50" cy="54" r="25" fill="var(--art)"/>
+  <path d="M26 54 a24 24 0 0 0 24 24 z" fill="var(--tok)" opacity=".28"/>
+  <circle cx="41" cy="46" r="3.4" fill="var(--tok)"/><circle cx="59" cy="46" r="3.4" fill="var(--tok)"/>
+  <path d="M43 54 h14 l-7 9z" fill="var(--tok)"/>
+  <g fill="var(--pip)"><circle cx="50" cy="9" r="4.2"/><circle cx="79" cy="21" r="4.2"/><circle cx="91" cy="50" r="4.2"/><circle cx="50" cy="91" r="4.2"/><circle cx="9" cy="50" r="4.2"/><circle cx="21" cy="21" r="4.2"/></g>
+</symbol>
+
+<!-- ══ C세트: 밤과 빛. 선만으로, 빛나는 윤곽 ══ -->
+<symbol id="c-lion" viewBox="0 0 100 100">
+  <g fill="none" stroke="var(--tok)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="50" cy="50" r="19"/>
+    <path d="M70 50 h7 M64.1 35.9 l5 -5 M50 30 v-7 M35.9 35.9 l-5 -5 M30 50 h-7 M35.9 64.1 l-5 5 M50 70 v7 M64.1 64.1 l5 5"/>
+    <path d="M43 46 v2.5 M57 46 v2.5"/>
+    <path d="M46 55 l4 3.5 l4 -3.5"/>
+  </g>
+  <g fill="var(--pip)"><circle cx="50" cy="10" r="3.8"/><circle cx="85" cy="15" r="3.8"/><circle cx="90" cy="50" r="3.8"/><circle cx="85" cy="85" r="3.8"/><circle cx="50" cy="90" r="3.8"/><circle cx="15" cy="85" r="3.8"/><circle cx="10" cy="50" r="3.8"/><circle cx="15" cy="15" r="3.8"/></g>
+</symbol>
+<symbol id="c-giraffe" viewBox="0 0 100 100">
+  <g fill="none" stroke="var(--tok)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 78 v-28 M56 78 v-28"/>
+    <rect x="36" y="30" width="28" height="20" rx="9"/>
+    <path d="M42 30 v-8 M58 30 v-8"/>
+    <circle cx="42" cy="20" r="3"/><circle cx="58" cy="20" r="3"/>
+    <path d="M46 39 v2 M56 39 v2"/>
+    <path d="M47 58 h6 M47 68 h6"/>
+  </g>
+  <g fill="var(--pip)"><circle cx="50" cy="10" r="3.8"/><circle cx="90" cy="50" r="3.8"/><circle cx="50" cy="90" r="3.8"/><circle cx="10" cy="50" r="3.8"/></g>
+</symbol>
+<symbol id="c-elephant" viewBox="0 0 100 100">
+  <g fill="none" stroke="var(--tok)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 36 a20 20 0 0 1 36 0 v22 h-36z"/>
+    <path d="M32 40 q-12 -4 -12 9 q0 13 12 9"/>
+    <path d="M68 40 q12 -4 12 9 q0 13 -12 9"/>
+    <path d="M50 58 q-3 11 3 15 q5 4 9 -2"/>
+    <path d="M42 45 v2.5 M58 45 v2.5"/>
+  </g>
+  <g fill="var(--pip)"><circle cx="85" cy="15" r="3.8"/><circle cx="85" cy="85" r="3.8"/><circle cx="15" cy="85" r="3.8"/><circle cx="15" cy="15" r="3.8"/></g>
+</symbol>
+<symbol id="c-chick" viewBox="0 0 100 100">
+  <g fill="none" stroke="var(--tok)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 27 v-8 M50 27 q-4 -6 -9 -7 M50 27 q4 -6 9 -7"/>
+    <circle cx="50" cy="55" r="24"/>
+    <path d="M43 52 h14 l-7 9z"/>
+    <path d="M41 44 v2.5 M59 44 v2.5"/>
+    <path d="M44 79 v5 M56 79 v5"/>
+  </g>
+  <circle cx="50" cy="10" r="3.8" fill="var(--pip)"/>
+</symbol>
+<symbol id="c-hen" viewBox="0 0 100 100">
+  <g fill="none" stroke="var(--tok)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38 27 q3 -10 7 -1 q4 -10 8 -1 q4 -9 7 0"/>
+    <circle cx="50" cy="56" r="24"/>
+    <path d="M43 53 h14 l-7 9z"/>
+    <path d="M40 45 v2.5 M60 45 v2.5"/>
+    <path d="M32 60 q12 -8 22 3 q-10 9 -22 -3z"/>
+    <path d="M26 46 q-9 -4 -11 -13"/>
+  </g>
+  <g fill="var(--pip)"><circle cx="50" cy="10" r="3.8"/><circle cx="85" cy="15" r="3.8"/><circle cx="90" cy="50" r="3.8"/><circle cx="50" cy="90" r="3.8"/><circle cx="10" cy="50" r="3.8"/><circle cx="15" cy="15" r="3.8"/></g>
+</symbol>
+</defs></svg>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Dōbutsu Shōgi · Visual Direction</p>
+  <h1>동물쇼기, 세 가지 얼굴</h1>
+  <p>3열 4행 보드 하나에 기물은 다섯 종류뿐입니다. 규칙이 이미 최소한이라, 이 게임의 인상은 전적으로 판과 기물의 재질감에서 결정됩니다. 같은 국면을 세 가지 재질로 그렸습니다 — 나무와 먹, 색면과 블록, 선과 빛.</p>
+  <div class="specs">
+    <span>보드 <b>3×4</b></span>
+    <span>기물 <b>사자·기린·코끼리·병아리·닭</b></span>
+    <span>타깃 <b>태블릿 가로 16:10</b></span>
+    <span>화면 상태 <b>중반전 · 내 차례</b></span>
+  </div>
+</header>
+
+<!-- ════════ A ════════ -->
+<article class="plate v-a">
+  <div class="plate-head">
+    <span class="tag">A</span>
+    <h2>나무와 먹</h2>
+    <span class="jp">桐と墨</span>
+  </div>
+  <p class="thesis">실제 쇼기판의 재료를 그대로 가져옵니다. 오동나무 판, 옻으로 그은 선, 오각형 코마. 기물 색은 양쪽이 같고 <b>방향만으로</b> 편을 구분하는 원작 규칙을 지킵니다 — 판을 돌려 앉는 감각이 화면에 남습니다.</p>
+
+  <div class="plate-body">
+    <div class="tablet"><div class="screen">
+      <div class="tray theirs you">
+        <span class="tray-label">상대 손패</span>
+        <span class="tray-name">코알라 2급</span>
+        <div class="held"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#a-giraffe"/></svg></span></div>
+      </div>
+      <div class="board-area"><div class="board">
+        <div class="cell you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#a-giraffe"/></svg></span></div>
+        <div class="cell you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#a-lion"/></svg></span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-hen"/></svg></span></div>
+        <div class="cell trail"></div>
+        <div class="cell"></div>
+        <div class="cell move"></div>
+        <div class="cell trail you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#a-chick"/></svg></span></div>
+        <div class="cell sel me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-elephant"/></svg></span></div>
+        <div class="cell me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-lion"/></svg></span></div>
+        <div class="cell"></div>
+      </div></div>
+      <div class="tray mine me">
+        <span class="turn">내 차례</span>
+        <span class="tray-name">나</span>
+        <div class="held"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-elephant"/></svg></span></div>
+        <span class="tray-label">내 손패</span>
+      </div>
+    </div></div>
+
+    <div class="spec">
+      <section>
+        <h3>Palette</h3>
+        <div class="swatches">
+          <div class="sw"><i style="background:#e0bc80"></i><span>#E0BC80 桐</span></div>
+          <div class="sw"><i style="background:#6b4a26"></i><span>#6B4A26 漆</span></div>
+          <div class="sw"><i style="background:#f8ecd2"></i><span>#F8ECD2 駒</span></div>
+          <div class="sw"><i style="background:#b8402a"></i><span>#B8402A 朱</span></div>
+          <div class="sw"><i style="background:#2a1d12"></i><span>#2A1D12 墨</span></div>
+        </div>
+      </section>
+      <section>
+        <h3>Type</h3>
+        <p class="typ"><b>고운바탕 + 명조</b><small>세로획이 가는 명조. 획의 굵기 대비가 붓 자국과 같은 계열이라 판 위에서 이물감이 없습니다.</small></p>
+      </section>
+      <section>
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>코마 실루엣</b> 오각형 clip-path. 앞쪽이 뾰족해 방향이 형태로 읽힙니다.</li>
+          <li><b>이동 표시</b> 붉은 점을 코마 테두리에 인쇄 — 원작의 핵심 학습 장치를 그대로.</li>
+          <li><b>애니메이션</b> 나무 끼리 부딪는 짧은 튕김(120ms). 잡을 때 코마가 180° 뒤집히며 손패로 날아갑니다.</li>
+          <li><b>리스크</b> 양쪽 색이 같아 초보자가 헷갈릴 수 있음 — 판 가장자리 색 띠로 보완 필요.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-lion"/></svg></span><b>사자</b><span>8방향</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-giraffe"/></svg></span><b>기린</b><span>상하좌우</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-elephant"/></svg></span><b>코끼리</b><span>대각 4방향</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-chick"/></svg></span><b>병아리</b><span>앞 1칸</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#a-hen"/></svg></span><b>닭</b><span>대각 뒤 제외 6방향</span></div>
+    <p class="strip-foot">기물 주위의 <b>붉은 점이 곧 이동 가능 방향</b>입니다. 세 방향 모두 이 규칙을 유지하므로, 규칙서를 따로 읽지 않아도 기물만 보고 둘 수 있습니다.</p>
+  </div>
+</article>
+
+<!-- ════════ B ════════ -->
+<article class="plate v-b">
+  <div class="plate-head">
+    <span class="tag">B</span>
+    <h2>원과 적목</h2>
+    <span class="jp">円と積み木</span>
+  </div>
+  <p class="thesis">동물을 삼각형·사각형·원으로만 조립합니다. 기물은 진영색 원반이라 <b>파랑이 나, 주황이 상대</b> — 한눈에 갈립니다. 판은 거의 흰 종이이고 색은 기물에만 있습니다. 나무 교구 상자를 태블릿에 올려놓은 쪽입니다.</p>
+
+  <div class="plate-body">
+    <div class="tablet"><div class="screen">
+      <div class="tray theirs you">
+        <span class="tray-label">상대 손패</span>
+        <span class="tray-name">코알라 2급</span>
+        <div class="held"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#b-giraffe"/></svg></span></div>
+      </div>
+      <div class="board-area"><div class="board">
+        <div class="cell you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#b-giraffe"/></svg></span></div>
+        <div class="cell you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#b-lion"/></svg></span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-hen"/></svg></span></div>
+        <div class="cell trail"></div>
+        <div class="cell"></div>
+        <div class="cell move"></div>
+        <div class="cell trail you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#b-chick"/></svg></span></div>
+        <div class="cell sel me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-elephant"/></svg></span></div>
+        <div class="cell me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-lion"/></svg></span></div>
+        <div class="cell"></div>
+      </div></div>
+      <div class="tray mine me">
+        <span class="turn">내 차례</span>
+        <span class="tray-name">나</span>
+        <div class="held"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-elephant"/></svg></span></div>
+        <span class="tray-label">내 손패</span>
+      </div>
+    </div></div>
+
+    <div class="spec">
+      <section>
+        <h3>Palette</h3>
+        <div class="swatches">
+          <div class="sw"><i style="background:#f7f6f2"></i><span>#F7F6F2 판</span></div>
+          <div class="sw"><i style="background:#1b4db1"></i><span>#1B4DB1 나</span></div>
+          <div class="sw"><i style="background:#d64f2a"></i><span>#D64F2A 상대</span></div>
+          <div class="sw"><i style="background:#f2c230"></i><span>#F2C230 표시</span></div>
+          <div class="sw"><i style="background:#15171b"></i><span>#15171B 글자</span></div>
+        </div>
+      </section>
+      <section>
+        <h3>Type</h3>
+        <p class="typ"><b>Gothic A1 900 / 400</b><small>기하학적 산세리프. 굵기만 극단으로 벌려 쓰고 서체는 하나로 통일 — 도형과 같은 어휘.</small></p>
+      </section>
+      <section>
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>기물 형태</b> 원반. 어느 각도에서 잡아도 동일하고 터치 타깃이 넓습니다.</li>
+          <li><b>이동 표시</b> 노란 점. 진영색(파랑·주황) 어디에도 속하지 않아 색 충돌이 없습니다.</li>
+          <li><b>애니메이션</b> 원반 굴리기. 이동 시 회전하며 미끄러지고, 승격은 원반이 뒤집히며 색면이 갈라집니다.</li>
+          <li><b>리스크</b> 동물의 귀여움이 가장 약한 안. 아이 대상이면 감점, 성인 대상이면 가장 깔끔합니다.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-lion"/></svg></span><b>사자</b><span>8방향</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-giraffe"/></svg></span><b>기린</b><span>상하좌우</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-elephant"/></svg></span><b>코끼리</b><span>대각 4방향</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-chick"/></svg></span><b>병아리</b><span>앞 1칸</span></div>
+    <div class="chip you"><span class="piece"><svg viewBox="0 0 100 100"><use href="#b-hen"/></svg></span><b>닭 (상대색)</b><span>대각 뒤 제외 6방향</span></div>
+    <p class="strip-foot">닭만 <b>상대 진영색</b>으로 뽑았습니다. 같은 도안이 색만 바꿔 양쪽에 쓰인다는 점을 확인하세요.</p>
+  </div>
+</article>
+
+<!-- ════════ C ════════ -->
+<article class="plate v-c">
+  <div class="plate-head">
+    <span class="tag">C</span>
+    <h2>밤과 빛</h2>
+    <span class="jp">夜と光</span>
+  </div>
+  <p class="thesis">채움을 전부 걷어내고 선만 남깁니다. 어두운 판 위에서 민트는 나, 산호색은 상대. 기물이 발광체이므로 <b>이동 가능 칸·장군·마지막 수</b>가 전부 빛의 세기로 표현됩니다 — 색을 더 쓰지 않고 상태를 말할 수 있습니다.</p>
+
+  <div class="plate-body">
+    <div class="tablet"><div class="screen">
+      <div class="tray theirs you">
+        <span class="tray-label">상대 손패</span>
+        <span class="tray-name">코알라 2급</span>
+        <div class="held"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#c-giraffe"/></svg></span></div>
+      </div>
+      <div class="board-area"><div class="board">
+        <div class="cell you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#c-giraffe"/></svg></span></div>
+        <div class="cell you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#c-lion"/></svg></span></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-hen"/></svg></span></div>
+        <div class="cell trail"></div>
+        <div class="cell"></div>
+        <div class="cell move"></div>
+        <div class="cell trail you"><span class="piece flip"><svg viewBox="0 0 100 100"><use href="#c-chick"/></svg></span></div>
+        <div class="cell sel me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-elephant"/></svg></span></div>
+        <div class="cell me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-lion"/></svg></span></div>
+        <div class="cell"></div>
+      </div></div>
+      <div class="tray mine me">
+        <span class="turn">내 차례</span>
+        <span class="tray-name">나</span>
+        <div class="held"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-elephant"/></svg></span></div>
+        <span class="tray-label">내 손패</span>
+      </div>
+    </div></div>
+
+    <div class="spec">
+      <section>
+        <h3>Palette</h3>
+        <div class="swatches">
+          <div class="sw"><i style="background:#0b1016"></i><span>#0B1016 판</span></div>
+          <div class="sw"><i style="background:#1b2836"></i><span>#1B2836 선</span></div>
+          <div class="sw"><i style="background:#57e6c3"></i><span>#57E6C3 나</span></div>
+          <div class="sw"><i style="background:#ff7a6b"></i><span>#FF7A6B 상대</span></div>
+          <div class="sw"><i style="background:#dfe9f2"></i><span>#DFE9F2 글자</span></div>
+        </div>
+      </section>
+      <section>
+        <h3>Type</h3>
+        <p class="typ"><b>Gothic A1 + JetBrains Mono</b><small>수치·좌표·기보는 전부 모노. 등폭 숫자가 초읽기 타이머에서 흔들리지 않습니다.</small></p>
+      </section>
+      <section>
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>기물 형태</b> 선 굵기 4.5 고정. 어느 크기로 줄여도 형태가 무너지지 않습니다.</li>
+          <li><b>이동 표시</b> 진영색 발광 점 + 맥동. 내 차례일 때만 빛나 시선이 판을 벗어나지 않습니다.</li>
+          <li><b>애니메이션</b> 궤적을 남기며 이동. 잡을 때 빛이 꺼졌다가 상대 손패에서 반대 색으로 다시 켜집니다 — 편이 바뀐다는 규칙이 연출로 설명됩니다.</li>
+          <li><b>리스크</b> 원작의 아동 친화성에서 가장 먼 안. 다크 단일 테마 고정입니다.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-lion"/></svg></span><b>사자</b><span>8방향</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-giraffe"/></svg></span><b>기린</b><span>상하좌우</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-elephant"/></svg></span><b>코끼리</b><span>대각 4방향</span></div>
+    <div class="chip me"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-chick"/></svg></span><b>병아리</b><span>앞 1칸</span></div>
+    <div class="chip you"><span class="piece"><svg viewBox="0 0 100 100"><use href="#c-hen"/></svg></span><b>닭 (상대색)</b><span>대각 뒤 제외 6방향</span></div>
+    <p class="strip-foot">선 색만 바꿔 양 진영을 만듭니다. 도안 파일은 <b>한 벌</b>이면 충분합니다.</p>
+  </div>
+</article>
+
+<section class="close">
+  <h2>다음에 정할 것</h2>
+  <ul class="qs">
+    <li><b>방향</b>A·B·C 중 하나, 또는 섞기. "A의 판 + B의 기물" 같은 조합도 가능합니다.</li>
+    <li><b>진영 구분</b>방향만으로 구분(A) vs 색으로 구분(B·C). 규칙 충실도와 가독성의 교환입니다.</li>
+    <li><b>이동 점 표시</b>항상 표시 / 선택했을 때만 / 설정으로 끄기 — 초보자용 장치를 계속 켜둘지.</li>
+    <li><b>기물 이름</b>화면에 한글 이름을 같이 넣을지, 그림만 둘지.</li>
+  </ul>
+</section>
+
+</div>
